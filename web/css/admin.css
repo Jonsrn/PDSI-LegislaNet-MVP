@@ -1,0 +1,45 @@
+/* Estilos Comuns do Painel Administrativo */
+
+/* Emblema "Admin" na Sidebar */
+.admin-badge {
+    background: linear-gradient(45deg, var(--accent-gold), var(--accent-orange));
+    color: #0d1117;
+    font-size: 0.7rem;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+    text-align: center;
+    display: block;
+}
+
+/* Informações do Usuário no Cabeçalho */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #D4AF37;
+}
+
+.user-details .name {
+    font-weight: 600;
+    display: block;
+    color: var(--primary-text);
+}
+
+.user-details .role {
+    font-size: 0.8rem;
+    color: #D4AF37;
+}

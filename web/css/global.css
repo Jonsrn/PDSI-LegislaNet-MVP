@@ -1,0 +1,584 @@
+/* global.css */
+
+/* --- Variáveis Globais Unificadas --- */
+:root {
+  /* Backgrounds */
+  --background-dark: #0d1117;
+  --background-light: #161b22;
+  --sidebar-bg: #161b22;
+  --card-bg: #161b22;
+  --hover-bg: #21262d;
+  --secondary-bg: #2e343b;
+
+  /* Borders */
+  --border-color: #30363d;
+
+  /* Text Colors */
+  --primary-text: #e6edf3;
+  --secondary-text: #8b949e;
+
+  /* Accent Colors */
+  --accent-blue: #58a6ff;
+  --accent-green: #2ea043;
+  --accent-red: #da3633;
+  --accent-orange: #f08833;
+  --accent-purple: #8a3ab9;
+  --accent-gold: #D4AF37;
+
+  /* Status Colors */
+  --excel-green: #1d6f42;
+  --pdf-red: #b30b00;
+
+  /* Warning Colors */
+  --warning-bg: rgba(240, 136, 51, 0.1);
+  --warning-text: #f08833;
+
+  /* Pulse Effects */
+  --pulse-color-green: rgba(46, 160, 67, 0.7);
+  --pulse-color-blue: rgba(88, 166, 255, 0.7);
+  --pulse-color-green-rgb: 46, 160, 67;
+  --pulse-color-blue-rgb: 88, 166, 255;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--background-dark);
+  color: var(--primary-text);
+  position: relative;
+}
+
+/* --- INÍCIO: BACKGROUND ESTÁTICO --- */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+
+  /* Background estático com gradiente suave usando as cores da paleta */
+  background: linear-gradient(
+      135deg,
+      rgba(88, 166, 255, 0.08) 0%,     /* accent-blue */
+      rgba(46, 160, 67, 0.06) 25%,     /* accent-green */
+      rgba(138, 58, 185, 0.05) 50%,    /* accent-purple */
+      rgba(240, 136, 51, 0.07) 75%,    /* accent-orange */
+      rgba(88, 166, 255, 0.04) 100%    /* accent-blue */
+    ),
+    radial-gradient(
+      ellipse at 20% 30%,
+      rgba(46, 160, 67, 0.05) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse at 80% 70%,
+      rgba(138, 58, 185, 0.04) 0%,
+      transparent 60%
+    );
+
+  opacity: 1;
+}
+/* --- FIM: BACKGROUND ESTÁTICO --- */
+
+/* --- Layout Principal da Aplicação --- */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* --- Barra Lateral (Sidebar) --- */
+.sidebar {
+  width: 250px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+}
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.sidebar-header .logo-icon {
+  font-size: 1.5rem;
+  color: var(--accent-blue);
+}
+.sidebar-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sidebar-header .logo-svg {
+  height: 32px;
+  width: auto;
+  flex-shrink: 0;
+}
+.nav-menu {
+  list-style: none;
+  flex-grow: 1;
+}
+.nav-group-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 20px 0 12px 0;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(46, 160, 67, 0.1));
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-blue);
+  position: relative;
+}
+
+.nav-group-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+  border-radius: 0 3px 3px 0;
+}
+
+.nav-group-title i {
+  font-size: 0.9rem;
+  color: var(--accent-green);
+}
+.nav-item a {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--secondary-text);
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+  cursor: pointer;
+  gap: 10px;
+  position: relative;
+}
+
+.nav-item a i {
+  width: 16px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--accent-blue);
+  transition: color 0.2s ease;
+}
+
+.nav-item a:hover {
+  background-color: var(--hover-bg);
+  color: var(--primary-text);
+}
+
+.nav-item a:hover i {
+  color: var(--accent-green);
+}
+
+.nav-item.active a {
+  background-color: var(--accent-blue);
+  color: #ffffff;
+}
+
+.nav-item.active a i {
+  color: #ffffff;
+}
+
+/* Badge "Em breve" no sidebar */
+.coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 159, 10, 0.1);
+  color: #ff9f0a;
+  border: 1px solid rgba(255, 159, 10, 0.3);
+  padding: 3px 6px;
+  border-radius: 10px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.coming-soon-badge i {
+  font-size: 0.55rem;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* --- Conteúdo Principal e Transições --- */
+/* === MAIN CONTENT REESTRUTURADO === */
+.main-content {
+  margin-left: 250px; /* Espaço para sidebar fixa */
+  width: calc(100% - 250px); /* Largura restante */
+  min-height: 100vh; /* Altura mínima da viewport */
+  display: flex;
+  flex-direction: column; /* CRUCIAL: Layout em coluna */
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.main-content.transitioning {
+  opacity: 0;
+  transform: translateX(20px);
+}
+/* === HEADER === */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px 0;
+  flex-shrink: 0; /* Não encolhe */
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* === CONTENT WRAPPER - A MÁGICA ACONTECE AQUI === */
+.page-content-wrapper {
+  flex: 1; /* OCUPA TODO O ESPAÇO DISPONÍVEL */
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px 32px;
+  overflow-y: auto; /* Permite scroll se necessário */
+}
+
+/* === CONTENT AREA === */
+.content-area {
+  flex: 1; /* OCUPA O ESPAÇO DISPONÍVEL */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 0; /* Permite que o flex funcione corretamente */
+}
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-title i {
+  font-size: 1.25rem;
+}
+.header-title h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* --- Perfil do Usuário (Dropdown) --- */
+.user-profile {
+  position: relative;
+}
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.profile-button:hover {
+  background-color: #2e343b;
+}
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.profile-info .name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--primary-text);
+}
+.profile-info .email {
+  font-size: 0.75rem;
+  color: var(--primary-text);
+  opacity: 0.7;
+}
+.profile-button .fa-chevron-down {
+  transition: transform 0.2s;
+  color: var(--secondary-text);
+}
+.profile-button.active .fa-chevron-down {
+  transform: rotate(180deg);
+}
+.profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 110%;
+  right: 0;
+  width: 200px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  overflow: hidden;
+}
+.profile-dropdown.active {
+  display: block;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  color: var(--secondary-text);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+.dropdown-item:hover {
+  background-color: var(--hover-bg);
+  color: var(--primary-text);
+}
+.dropdown-item i {
+  width: 16px;
+}
+.dropdown-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 4px 0;
+}
+
+/* --- Componentes Comuns: Botões, Badges, Paginação --- */
+.btn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.2s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+.btn:active {
+  transform: scale(0.98);
+  filter: brightness(0.95);
+}
+.btn-primary {
+  background-color: var(--accent-green);
+  color: white;
+}
+.btn-secondary {
+  background-color: var(--hover-bg);
+  color: var(--primary-text);
+  border: 1px solid var(--border-color);
+}
+
+.actions-cell {
+  text-align: right;
+}
+.actions-cell .btn-action {
+  color: white;
+  padding: 6px 14px;
+  margin-left: 8px;
+  text-decoration: none;
+}
+.btn-edit {
+  background-color: var(--accent-orange);
+}
+.btn-remove {
+  background-color: var(--accent-red);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  /* Cores padrão removidas - devem ser definidas por classes específicas */
+}
+
+.badge-aprovado {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: rgba(46, 160, 67, 0.2);
+  color: #71e67f;
+  border: 1px solid rgba(46, 160, 67, 0.4);
+}
+.badge-reprovado {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: rgba(218, 54, 51, 0.2);
+  color: #fa918c;
+  border: 1px solid rgba(218, 54, 51, 0.4);
+}
+/* --- Responsividade Global --- */
+/* ALTERAR a seção de responsividade existente */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .main-content {
+    margin-left: 0;
+    width: 100%; /* ADICIONAR esta linha */
+  }
+}
+
+/* --- ESTILOS PARA ANIMAÇÃO DE FADE --- */
+.fade-in {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================== */
+/* SISTEMA DE TOAST           */
+/* ================================== */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 400px;
+  color: #fff;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateX(120%);
+  transition: transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast-icon {
+  font-size: 1.2rem;
+  margin-right: 15px;
+}
+
+.toast.success {
+  background-color: var(--accent-green, #28a745);
+}
+.toast.error {
+  background-color: var(--accent-red, #dc3545);
+}
+.toast.info {
+  background-color: var(--accent-blue, #17a2b8);
+}
+
+/* ================================== */
+/* OVERLAY DE CARREGAMENTO        */
+/* ================================== */
+.form-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(13, 17, 23, 0.7); /* Cor de fundo com transparência */
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.form-loading-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.form-loading-overlay .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color, #444);
+  border-top-color: var(--accent-blue, #3498db);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.form-loading-overlay .loading-text {
+  color: var(--primary-text, #fff);
+  font-weight: 500;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================================================= */
+/* ESTRUTURA DE LAYOUT FLEX PARA RODAPÉ FIXO (STICKY FOOTER) */
+/* ================================================= */
+
+/* Adicione esta nova regra no final do global.css */
+.content-section,
+.page-content-wrapper {
+  flex-grow: 1;
+}
