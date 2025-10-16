@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro de Pautas - Legisla Net</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/forms.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link rel="stylesheet" href="../css/modals.css" />
+    <link rel="stylesheet" href="../css/pagination.css" />
+    <link rel="stylesheet" href="../css/toast.css" />
+    <link rel="stylesheet" href="../css/customSelect.css" />
+
+    <style>
+      .pautas-section {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 24px 24px 0 24px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0; /* Permite que o flex funcione corretamente */
+      }
+      .pautas-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .pautas-header h2 {
+        font-size: 1.25rem;
+        margin: 0;
+      }
+      .header-left {
+        display: flex;
+        align-items: center;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+      }
+      .filters-section {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 16px;
+        align-items: end;
+        flex-shrink: 0;
+      }
+      .filters-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+      }
+      .contador-pautas-filtros {
+        color: var(--secondary-text);
+        font-size: 0.875rem;
+        white-space: nowrap;
+      }
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--secondary-text);
+        font-size: 0.875rem;
+      }
+      .custom-select {
+        background-color: var(--hover-bg);
+        border: 1px solid var(--border-color);
+        color: var(--primary-text);
+        padding: 6px 12px;
+        border-radius: 6px;
+      }
+
+      @media (max-width: 768px) {
+        .filters-section {
+          grid-template-columns: 1fr;
+        }
+      }
+      .table-container {
+        flex-grow: 1;
+        overflow-x: auto;
+      }
+      .pautas-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+      .pautas-table th,
+      .pautas-table td {
+        padding: 12px 16px;
+        text-align: left;
+        white-space: nowrap;
+        vertical-align: middle;
+      }
+      .pautas-table tbody tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s;
+      }
+      .pautas-table tbody tr:hover {
+        background-color: var(--hover-bg);
+      }
+      .pautas-table th {
+        color: var(--secondary-text);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+      }
+      .pautas-table td .description {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+        display: block;
+      }
+      .pautas-table .link {
+        color: var(--accent-blue);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .status-cell {
+        position: relative;
+      }
+      .status-dropdown {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        cursor: pointer;
+      }
+      .status-badge-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px;
+        border-radius: 99px;
+        transition: background-color 0.2s;
+        border: 1px solid transparent;
+      }
+      .status-dropdown:hover .status-badge-wrapper {
+        background-color: var(--hover-bg);
+        border-color: var(--border-color);
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 99px;
+        font-weight: 500;
+        font-size: 0.8rem;
+        text-align: center;
+        white-space: nowrap;
+      }
+      /* Cores originais das tags com bordas específicas */
+      .status-badge.pendente {
+        background-color: rgba(240, 227, 51, 0.2);
+        color: rgb(233, 241, 110);
+        border: 1px solid rgba(240, 227, 51, 0.4);
+      }
+      .status-badge.em-votacao {
+        background-color: rgba(88, 166, 255, 0.2);
+        color: aqua;
+        border: 1px solid rgba(88, 166, 255, 0.4);
+      }
+      .status-badge.finalizada {
+        background-color: rgba(46, 160, 67, 0.2);
+        color: #71e67f;
+        border: 1px solid rgba(46, 160, 67, 0.4);
+      }
+      .status-badge.simbolica {
+        background-color: rgba(218, 54, 51, 0.2);
+        color: #f85149;
+        border: 1px solid rgba(218, 54, 51, 0.4);
+        margin-top: 4px;
+      }
+
+      .status-dropdown .fa-chevron-down {
+        color: var(--secondary-text);
+        font-size: 0.7rem;
+        margin-right: 8px;
+        transition: transform 0.2s;
+      }
+      .status-dropdown.open .fa-chevron-down {
+        transform: rotate(180deg);
+      }
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 4px;
+        z-index: 1000;
+        min-width: 100%;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .status-dropdown.open .dropdown-menu {
+        display: block;
+      }
+      /* Dropdown que abre para cima quando necessário */
+      .status-dropdown.dropdown-up .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin-bottom: 2px;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+      }
+      /* Garantir que o container da tabela permite overflow para dropdowns */
+      .table-container {
+        flex-grow: 1;
+        overflow-x: auto;
+        overflow-y: visible;
+        position: relative;
+      }
+      .dropdown-item {
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        color: var(--primary-text);
+      }
+      .dropdown-item:hover {
+        background-color: var(--accent-blue);
+        color: white;
+      }
+      .modal-body.confirm-text p {
+        line-height: 1.5;
+        color: var(--secondary-text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="sidebar-placeholder"></div>
+
+      <main class="main-content" id="mainContent">
+        <div id="header-placeholder"></div>
+
+        <section class="pautas-section fade-in">
+          <div class="pautas-header">
+            <div class="header-left">
+              <h2>Pautas</h2>
+            </div>
+            <div class="header-right">
+              <!-- Adicionado data-action para o listener delegado -->
+              <button class="btn btn-primary" data-action="nova-pauta">
+                Nova Pauta
+              </button>
+            </div>
+          </div>
+
+          <div class="filters-section">
+            <div class="form-group" style="margin: 0">
+              <label>Status</label>
+              <div class="custom-select-wrapper" id="filter-status-wrapper">
+                <input type="hidden" id="filter-status-value" name="status" />
+                <div class="custom-select-trigger">
+                  <span>Todos os status</span>
+                </div>
+                <div class="custom-options">
+                  <div class="custom-option" data-value="">
+                    <span>Todos os status</span>
+                  </div>
+                  <div class="custom-option" data-value="Pendente">
+                    <span>Pendente</span>
+                  </div>
+                  <div class="custom-option" data-value="Em Votação">
+                    <span>Em Votação</span>
+                  </div>
+                  <div class="custom-option" data-value="Finalizada">
+                    <span>Finalizada</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" style="margin: 0">
+              <label>Autor</label>
+              <div class="custom-select-wrapper" id="filter-autor-wrapper">
+                <input type="hidden" id="filter-autor-value" name="autor" />
+                <div class="custom-select-trigger">
+                  <span>Todos os autores</span>
+                </div>
+                <div class="custom-options">
+                  <div class="custom-option" data-value="">
+                    <span>Todos os autores</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" style="margin: 0">
+              <label for="filter-search">Buscar</label>
+              <input
+                type="text"
+                id="filter-search"
+                class="form-input"
+                placeholder="Nome da pauta..."
+              />
+            </div>
+            <div class="filters-right">
+              <button
+                type="button"
+                id="clear-filters"
+                class="btn btn-secondary"
+              >
+                <i class="fa-solid fa-filter-circle-xmark"></i> Limpar
+              </button>
+              <span id="contador-pautas" class="contador-pautas-filtros">0 pautas</span>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="pautas-table">
+              <thead>
+                <tr>
+                  <th>Nome da Pauta</th>
+                  <th>Descrição</th>
+                  <th>Link</th>
+                  <th>Status</th>
+                  <th>Autor</th>
+                  <th>Sessão</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Dados carregados dinamicamente via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination-container" id="pagination-container">
+            <div class="pagination-controls" id="pagination-controls"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-overlay" id="removerPautaModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Confirmar Exclusão</h3>
+          <button class="modal-close" onclick="closeModal('removerPautaModal')">
+            <i class="fa-solid fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body confirm-text">
+          <p>Você tem certeza que deseja remover a pauta:</p>
+          <p><strong id="pauta-nome-remover">Nome da pauta</strong></p>
+          <p style="color: var(--accent-red); font-weight: 500">
+            ⚠️ Esta ação não poderá ser desfeita.
+          </p>
+          <p style="color: var(--secondary-text); font-size: 0.875rem">
+            Nota: Só é possível remover pautas sem votos registrados.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeModal('removerPautaModal')"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn"
+            id="confirmar-remover-btn"
+            style="background-color: var(--accent-red); color: white"
+          >
+            <i class="fa-solid fa-trash"></i> Excluir Pauta
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/global.js"></script>
+    <script src="../js/modals.js"></script>
+    <script src="../js/pagination.js"></script>
+    <script src="../js/toast.js"></script>
+    <script src="../js/customSelect.js"></script>
+
+    <script>
+      let pautas = [];
+      let pautasFiltradas = [];
+      let currentPage = 1;
+      const PAUTAS_PER_PAGE = 8;
+      let statusSelect, autorSelect;
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Script para Dropdown de Status
+
+        try {
+          protectPage();
+          initLayout({
+            title: "Cadastro de Pautas",
+            icon: "fa-file-lines",
+            navActive: "nav-cadastro",
+          });
+
+          {
+            autoFixFormSectionLayout();
+          }
+
+          // Inicializar custom selects dos filtros
+          statusSelect = new CustomSelect({
+            wrapperId: "filter-status-wrapper",
+            placeholder: "Todos os status",
+            onSelect: () => aplicarFiltros(),
+          });
+
+          autorSelect = new CustomSelect({
+            wrapperId: "filter-autor-wrapper",
+            placeholder: "Todos os autores",
+            onSelect: () => aplicarFiltros(),
+          });
+
+          // Carregar pautas do banco
+          await carregarPautas();
+
+          // Configurar eventos dos filtros
+          const filterSearch = document.getElementById("filter-search");
+          const clearFiltersBtn = document.getElementById("clear-filters");
+
+          // Event listener para campo de busca com debounce
+          let searchTimeout;
+          filterSearch.addEventListener("input", () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(aplicarFiltros, 500);
+          });
+
+          // Event listener para botão limpar filtros
+          clearFiltersBtn.addEventListener("click", () => {
+            statusSelect.reset();
+            autorSelect.reset();
+            filterSearch.value = "";
+            aplicarFiltros();
+          });
+
+          // Verificação adicional de segurança para dropdowns após carregamento inicial
+          setTimeout(() => {
+            console.log(
+              "🔍 SAFETY CHECK: Verificando se todos os dropdowns foram configurados..."
+            );
+            const allDropdowns = document.querySelectorAll(".status-dropdown");
+            const unconfiguredDropdowns = document.querySelectorAll(
+              '.status-dropdown .status-badge-wrapper:not([data-configured="true"])'
+            );
+
+            console.log(
+              `📊 SAFETY CHECK: Total dropdowns: ${allDropdowns.length}, Não configurados: ${unconfiguredDropdowns.length}`
+            );
+
+            if (unconfiguredDropdowns.length > 0) {
+              console.warn(
+                "⚠️ SAFETY CHECK: Alguns dropdowns não foram configurados, tentando novamente..."
+              );
+              configurarDropdowns();
+            } else {
+              console.log(
+                "✅ SAFETY CHECK: Todos os dropdowns estão configurados corretamente"
+              );
+            }
+          }, 500);
+        } catch (e) {
+          console.error(e.message);
+          return; // Interrompe a execução se não estiver autenticado.
+        }
+
+        // Delegação de evento robusta: busca o elemento mais próximo com data-action
+        document.addEventListener("click", (e) => {
+          const el = e.target.closest("[data-action]");
+          if (!el) return;
+          const action = el.dataset.action;
+
+          if (action === "nova-pauta") {
+            console.log(
+              "Ação nova-pauta detectada → navigateToPage('nova_pauta')"
+            );
+            navigateToPage("nova_pauta");
+          } else if (action === "editar-pauta") {
+            console.log("Ação editar-pauta detectada");
+            const pautaId = el.dataset.pautaId;
+            if (pautaId) {
+              console.log(`Redirecionando para edição da pauta ${pautaId}`);
+              window.location.href = `editar_pauta.html?id=${pautaId}`;
+            } else {
+              showToast("Erro: ID da pauta não encontrado", "error");
+            }
+          } else if (action === "remover-pauta") {
+            console.log("Ação remover-pauta detectada");
+            const pautaId = el.dataset.pautaId;
+            const pautaRow = el.closest("tr");
+            const pautaNome = pautaRow
+              ? pautaRow.querySelector("td")?.textContent
+              : "Pauta";
+
+            // Configurar modal com dados da pauta
+            document.getElementById("pauta-nome-remover").textContent =
+              pautaNome;
+            document.getElementById("confirmar-remover-btn").dataset.pautaId =
+              pautaId;
+
+            openModal("removerPautaModal");
+          }
+        });
+
+        const statusDropdowns = document.querySelectorAll(".status-dropdown");
+        statusDropdowns.forEach((dropdown) => {
+          const badgeWrapper = dropdown.querySelector(".status-badge-wrapper");
+          const dropdownMenu = dropdown.querySelector(".dropdown-menu");
+
+          badgeWrapper.addEventListener("click", (event) => {
+            event.stopPropagation();
+            closeAllDropdowns(dropdown);
+            dropdown.classList.toggle("open");
+          });
+
+          dropdownMenu.querySelectorAll(".dropdown-item").forEach((item) => {
+            item.addEventListener("click", () => {
+              const newValue = item.getAttribute("data-value");
+              const newText = item.textContent;
+              const mainBadge = dropdown.querySelector(
+                ".status-badge-wrapper .status-badge"
+              );
+              if (mainBadge) {
+                mainBadge.classList.remove(
+                  "pendente",
+                  "em-votacao",
+                  "finalizada"
+                );
+                mainBadge.classList.add(newValue);
+                mainBadge.textContent = newText.toUpperCase();
+              }
+              dropdown.classList.remove("open");
+              console.log(`Status alterado para: ${newValue}`);
+            });
+          });
+        });
+
+        function closeAllDropdowns(exceptThisOne = null) {
+          // Buscar apenas dropdowns que realmente existem no DOM atual
+          const allDropdowns = document.querySelectorAll(".status-dropdown");
+          const openDropdowns = Array.from(allDropdowns).filter((dropdown) =>
+            dropdown.classList.contains("open")
+          );
+
+          console.log(
+            `🔒 CLOSE ALL: Dropdowns no DOM: ${
+              allDropdowns.length
+            }, Realmente abertos: ${openDropdowns.length}${
+              exceptThisOne ? " (exceto um)" : ""
+            }`
+          );
+
+          let closedCount = 0;
+          allDropdowns.forEach((dropdown) => {
+            if (dropdown !== exceptThisOne) {
+              const wasOpen = dropdown.classList.contains("open");
+
+              if (wasOpen) {
+                dropdown.classList.remove("open");
+                dropdown.classList.remove("dropdown-up");
+                const pautaId = dropdown.dataset.pautaId || "desconhecida";
+                console.log(
+                  `🔒 CLOSE ALL: Fechado dropdown da pauta ${pautaId}`
+                );
+                closedCount++;
+              }
+            }
+          });
+
+          console.log(
+            `🔒 CLOSE ALL: ${closedCount} dropdowns realmente fechados`
+          );
+        }
+
+        // Fechar dropdowns ao clicar fora
+        window.addEventListener("click", (event) => {
+          // Verificar se o clique foi dentro de algum dropdown
+          const clickedDropdown = event.target.closest(".status-dropdown");
+
+          if (!clickedDropdown) {
+            console.log(
+              "🔒 CLICK OUTSIDE: Fechando todos os dropdowns (clique fora)"
+            );
+            const openDropdowns = document.querySelectorAll(
+              ".status-dropdown.open"
+            );
+            console.log(
+              `🔒 CLICK OUTSIDE: Encontrados ${openDropdowns.length} dropdowns abertos para fechar`
+            );
+
+            // Resetar tracking manual além de fechar visualmente
+            const allDropdowns = document.querySelectorAll(".status-dropdown");
+            allDropdowns.forEach((dropdown) => {
+              dropdown.classList.remove("open", "dropdown-up");
+              const badge = dropdown.querySelector(".status-badge-wrapper");
+              if (badge) {
+                badge._dropdownState = "closed";
+              }
+            });
+
+            console.log(
+              `🔒 CLICK OUTSIDE: Tracking manual resetado para todos os dropdowns`
+            );
+          }
+        });
+
+        // Função para carregar pautas do banco
+        async function carregarPautas(page = 1, filtros = {}) {
+          try {
+            console.log(`📡 Carregando pautas - Página ${page}...`);
+
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+              throw new Error("Token não encontrado");
+            }
+
+            // Construir URL com parâmetros de paginação e filtros
+            const params = new URLSearchParams({
+              page: page,
+              limit: PAUTAS_PER_PAGE,
+              ...filtros,
+            });
+
+            const response = await fetch(`/api/pautas?${params}`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Erro ao carregar pautas: ${response.status}`);
+            }
+
+            const result = await response.json();
+            pautas = result.data || [];
+
+            console.log(
+              `✅ ${pautas.length} pautas carregadas (Página ${page})`
+            );
+
+            // Renderizar tabela com os dados
+            renderizarTabela();
+            atualizarContador(result.pagination);
+
+            // Atualizar opções do filtro de autor
+            atualizarFiltroAutor();
+
+            // Configurar paginação
+            configurarPaginacao(result.pagination);
+          } catch (error) {
+            console.error("❌ Erro ao carregar pautas:", error);
+            mostrarMensagemErro("Erro ao carregar pautas do banco de dados");
+          }
+        }
+
+        // Função para renderizar a tabela
+        function renderizarTabela() {
+          console.log("🎨 RENDER: Iniciando renderização da tabela...");
+
+          // LIMPEZA CRÍTICA: Garantir que todos os dropdowns são fechados antes de renderizar nova página
+          const existingDropdowns =
+            document.querySelectorAll(".status-dropdown");
+          console.log(
+            `🧹 RENDER: Limpando ${existingDropdowns.length} dropdowns existentes antes da renderização...`
+          );
+
+          existingDropdowns.forEach((dropdown, index) => {
+            const wasOpen = dropdown.classList.contains("open");
+            dropdown.classList.remove("open", "dropdown-up");
+
+            // Resetar tracking manual também
+            const badge = dropdown.querySelector(".status-badge-wrapper");
+            if (badge) {
+              badge._dropdownState = "closed";
+            }
+
+            if (wasOpen) {
+              const pautaId = dropdown.dataset.pautaId || `dropdown-${index}`;
+              console.log(
+                `🧹 RENDER: Dropdown da pauta ${pautaId} foi limpo (estava aberto, tracking resetado)`
+              );
+            }
+          });
+
+          const tbody = document.querySelector(".pautas-table tbody");
+
+          if (pautas.length === 0) {
+            console.log("📋 RENDER: Nenhuma pauta para exibir");
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 2rem; color: var(--secondary-text);">
+                  <i class="fa-regular fa-file-lines" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                  Nenhuma pauta encontrada
+                </td>
+              </tr>
+            `;
+            return;
+          }
+
+          console.log(`📋 RENDER: Renderizando ${pautas.length} pautas...`);
+
+          tbody.innerHTML = pautas
+            .map((pauta, index) => {
+              // Mapeamento correto de status para classes CSS
+              const getStatusClass = (status) => {
+                if (!status) return "pendente";
+
+                const statusMap = {
+                  pendente: "pendente",
+                  "em votação": "em-votacao",
+                  finalizada: "finalizada",
+                };
+
+                const normalized = status.toLowerCase().trim();
+                const cssClass = statusMap[normalized] || "pendente";
+
+                console.log(
+                  `🎨 STATUS CLASS: "${status}" → "${normalized}" → "${cssClass}"`
+                );
+                return cssClass;
+              };
+
+              const statusClass = getStatusClass(pauta.status);
+              const statusText = pauta.status || "Pendente";
+
+              // Função para truncar texto com limite
+              const truncateText = (text, maxLength, fallback = "N/A") => {
+                if (!text) return fallback;
+                return text.length > maxLength
+                  ? text.substring(0, maxLength) + "..."
+                  : text;
+              };
+
+              // Processar campos com limites
+              const nome = truncateText(pauta.nome, 35, "Sem nome");
+              const nomeFull = pauta.nome || "Sem nome";
+              const descricao = truncateText(
+                pauta.descricao,
+                40,
+                "Sem descrição"
+              );
+              const descricaoFull = pauta.descricao || "Sem descrição";
+              const autor = truncateText(pauta.autor, 25, "Não informado");
+              const autorFull = pauta.autor || "Não informado";
+              const sessaoNome = truncateText(pauta.sessoes?.nome, 30, "N/A");
+              const sessaoFull = pauta.sessoes?.nome || "N/A";
+
+              // Verificar se tem arquivo anexo
+              const linkArquivo = pauta.anexo_url
+                ? `<a href="${pauta.anexo_url}" target="_blank" class="link">Acessar PDF</a>`
+                : '<span style="color: var(--secondary-text);">Sem arquivo</span>';
+
+              // Badge para votação simbólica
+              const badgeSimbolica = pauta.votacao_simbolica
+                ? '<span class="status-badge simbolica">Votação simbólica</span>'
+                : "";
+
+              console.log(
+                `📄 RENDER: Pauta ${index + 1}/${pautas.length} - ID: ${
+                  pauta.id
+                }, Status: ${statusText}`
+              );
+
+              return `
+              <tr data-pauta-id="${pauta.id}">
+                <td title="${nomeFull}">${nome}</td>
+                <td>
+                  <span class="description" title="${descricaoFull}">
+                    ${descricao}
+                  </span>
+                </td>
+                <td>${linkArquivo}</td>
+                <td class="status-cell">
+                  <div class="status-dropdown" data-pauta-id="${
+                    pauta.id
+                  }" data-status="${statusText}">
+                    <div class="status-badge-wrapper">
+                      <span class="status-badge ${statusClass}">${statusText.toUpperCase()}</span>
+                      <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                      <div class="dropdown-item" data-value="pendente">Pendente</div>
+                      <div class="dropdown-item" data-value="em-votacao">Em Votação</div>
+                      <div class="dropdown-item" data-value="finalizada">Finalizada</div>
+                    </div>
+                  </div>
+                  ${badgeSimbolica}
+                </td>
+                <td title="${autorFull}">${autor}</td>
+                <td title="${sessaoFull}">${sessaoNome}</td>
+                <td class="actions-cell">
+                  <button class="btn btn-action btn-edit" data-action="editar-pauta" data-pauta-id="${
+                    pauta.id
+                  }">
+                    Editar
+                  </button>
+                  <button class="btn btn-action btn-remove" data-action="remover-pauta" data-pauta-id="${
+                    pauta.id
+                  }">
+                    Remover
+                  </button>
+                </td>
+              </tr>
+            `;
+            })
+            .join("");
+
+          console.log("✅ RENDER: HTML da tabela inserido no DOM");
+
+          // Aguardar o DOM atualizar completamente antes de configurar dropdowns
+          setTimeout(() => {
+            console.log(
+              "⏰ RENDER: Iniciando configuração de dropdowns após timeout..."
+            );
+            configurarDropdowns();
+          }, 100);
+        }
+
+        // Função para configurar dropdowns de status
+        function configurarDropdowns() {
+          console.log("🔧 DROPDOWN: Iniciando configuração dos dropdowns...");
+
+          // DIAGNÓSTICO INICIAL: Verificar se algum dropdown já tem classe open
+          const preExistingOpen = document.querySelectorAll(
+            ".status-dropdown.open"
+          );
+          if (preExistingOpen.length > 0) {
+            console.warn(
+              `🚨 DIAGNÓSTICO: Encontrados ${preExistingOpen.length} dropdowns com classe 'open' ANTES da configuração!`
+            );
+            preExistingOpen.forEach((problematic, idx) => {
+              const problematicId =
+                problematic.dataset.pautaId || `dropdown-${idx}`;
+              console.warn(
+                `🚨 DIAGNÓSTICO: Dropdown problemático: ${problematicId}`
+              );
+              console.warn(
+                `🚨 DIAGNÓSTICO: Classes:`,
+                Array.from(problematic.classList)
+              );
+
+              // Limpar imediatamente
+              problematic.classList.remove("open", "dropdown-up");
+              console.warn(
+                `🚨 DIAGNÓSTICO: Limpeza preventiva aplicada para ${problematicId}`
+              );
+            });
+          }
+
+          const statusDropdowns = document.querySelectorAll(".status-dropdown");
+          console.log(
+            `🔢 DROPDOWN: Encontrados ${statusDropdowns.length} dropdowns para configurar`
+          );
+
+          if (statusDropdowns.length === 0) {
+            console.warn(
+              "⚠️ DROPDOWN: Nenhum dropdown encontrado! Verificando se a tabela foi renderizada..."
+            );
+            const tbody = document.querySelector(".pautas-table tbody");
+            console.log(
+              "📋 DROPDOWN: Conteúdo do tbody:",
+              tbody?.innerHTML?.substring(0, 200) + "..."
+            );
+            return;
+          }
+
+          statusDropdowns.forEach((dropdown, index) => {
+            const pautaId = dropdown.dataset.pautaId;
+            const currentStatus = dropdown.dataset.status;
+
+            console.log(
+              `⚙️ DROPDOWN ${index + 1}/${
+                statusDropdowns.length
+              }: Configurando pauta ${pautaId} (Status: ${currentStatus})`
+            );
+
+            const badgeWrapper = dropdown.querySelector(
+              ".status-badge-wrapper"
+            );
+            const dropdownMenu = dropdown.querySelector(".dropdown-menu");
+
+            if (!badgeWrapper) {
+              console.error(
+                `❌ DROPDOWN ${
+                  index + 1
+                }: Badge wrapper não encontrado para pauta ${pautaId}`
+              );
+              return;
+            }
+
+            if (!dropdownMenu) {
+              console.error(
+                `❌ DROPDOWN ${
+                  index + 1
+                }: Menu não encontrado para pauta ${pautaId}`
+              );
+              return;
+            }
+
+            // Verificar se já tem event listeners (indicador de duplicação)
+            if (badgeWrapper.dataset.configured === "true") {
+              console.warn(
+                `⚠️ DROPDOWN ${
+                  index + 1
+                }: Badge wrapper já configurado para pauta ${pautaId}, pulando...`
+              );
+              return;
+            }
+
+            console.log(
+              `🔧 DROPDOWN ${index + 1}: Configurando event listeners...`
+            );
+
+            // Marcar como configurado
+            badgeWrapper.dataset.configured = "true";
+            dropdownMenu.dataset.configured = "true";
+
+            // Variável para tracking manual do estado
+            let dropdownState = "closed";
+
+            badgeWrapper.addEventListener("click", (event) => {
+              console.log(
+                `👆 DROPDOWN CLICK: Pauta ${pautaId} - Badge clicado`
+              );
+              event.stopPropagation();
+
+              // Verificar estado via classe E via tracking manual
+              const classState = dropdown.classList.contains("open");
+              console.log(
+                `🔍 DROPDOWN STATE: Pauta ${pautaId} - Classe: ${
+                  classState ? "ABERTO" : "FECHADO"
+                }, Tracking: ${dropdownState}`
+              );
+
+              // SEMPRE limpar todos os dropdowns primeiro
+              console.log(
+                `🧹 DROPDOWN CLICK: Limpeza TOTAL de todos os dropdowns...`
+              );
+
+              const allDropdowns =
+                document.querySelectorAll(".status-dropdown");
+              allDropdowns.forEach((anyDropdown, idx) => {
+                anyDropdown.classList.remove("open", "dropdown-up");
+                // Resetar tracking de todos os outros dropdowns
+                const otherBadge = anyDropdown.querySelector(
+                  ".status-badge-wrapper"
+                );
+                if (otherBadge && otherBadge !== badgeWrapper) {
+                  otherBadge._dropdownState = "closed";
+                }
+              });
+
+              console.log(`🧹 LIMPEZA TOTAL: Todos os dropdowns limpos`);
+
+              // Decidir ação baseada no tracking manual
+              if (dropdownState === "closed") {
+                // ABRIR
+                dropdown.classList.add("open");
+                dropdownState = "open";
+                badgeWrapper._dropdownState = "open";
+                console.log(`🎯 DROPDOWN CLICK: Pauta ${pautaId} - ABRINDO`);
+
+                // Calcular posicionamento
+                requestAnimationFrame(() => {
+                  const rect = dropdown.getBoundingClientRect();
+                  const menuRect = dropdownMenu.getBoundingClientRect();
+                  const viewportHeight = window.innerHeight;
+                  const containerRect = dropdown
+                    .closest(".table-container")
+                    ?.getBoundingClientRect();
+                  const containerBottom = containerRect
+                    ? containerRect.bottom
+                    : viewportHeight;
+
+                  const spaceBelow =
+                    Math.min(viewportHeight, containerBottom) - rect.bottom;
+                  const spaceAbove = rect.top;
+
+                  console.log(`📐 DROPDOWN POSITION: Pauta ${pautaId}`, {
+                    spaceBelow: Math.round(spaceBelow),
+                    spaceAbove: Math.round(spaceAbove),
+                    menuHeight: Math.round(menuRect.height),
+                    viewportHeight,
+                    containerBottom: containerRect
+                      ? Math.round(containerBottom)
+                      : "N/A",
+                  });
+
+                  const safetyMargin = 20;
+                  const needsSpaceBelow = menuRect.height + safetyMargin;
+
+                  if (
+                    spaceBelow < needsSpaceBelow &&
+                    spaceAbove > needsSpaceBelow
+                  ) {
+                    dropdown.classList.add("dropdown-up");
+                    console.log(
+                      `⬆️ DROPDOWN POSITION: Pauta ${pautaId} - Abrindo para CIMA`
+                    );
+                  } else if (
+                    spaceBelow < needsSpaceBelow &&
+                    spaceAbove < needsSpaceBelow
+                  ) {
+                    dropdown.classList.add("dropdown-up");
+                    console.log(
+                      `⬆️ DROPDOWN POSITION: Pauta ${pautaId} - FORÇANDO para CIMA`
+                    );
+                  } else {
+                    dropdown.classList.remove("dropdown-up");
+                    console.log(
+                      `⬇️ DROPDOWN POSITION: Pauta ${pautaId} - Abrindo para BAIXO`
+                    );
+                  }
+                });
+              } else {
+                // FECHAR (já foi limpo na limpeza total)
+                dropdownState = "closed";
+                badgeWrapper._dropdownState = "closed";
+                console.log(`🎯 DROPDOWN CLICK: Pauta ${pautaId} - FECHANDO`);
+              }
+            });
+
+            // Inicializar tracking
+            badgeWrapper._dropdownState = "closed";
+
+            // Configurar items do dropdown
+            const menuItems = dropdownMenu.querySelectorAll(".dropdown-item");
+            console.log(
+              `📋 DROPDOWN ${index + 1}: Configurando ${
+                menuItems.length
+              } itens do menu`
+            );
+
+            menuItems.forEach((item, itemIndex) => {
+              const itemValue = item.getAttribute("data-value");
+              const itemText = item.textContent;
+
+              console.log(
+                `📝 DROPDOWN ${index + 1}: Item ${
+                  itemIndex + 1
+                } - ${itemValue}: ${itemText}`
+              );
+
+              item.addEventListener("click", async (event) => {
+                console.log(
+                  `🎯 MENU ITEM CLICK: Pauta ${pautaId} - Selecionado: ${itemText} (${itemValue})`
+                );
+                event.stopPropagation();
+
+                const newValue = itemValue;
+                const newText = itemText;
+                const mainBadge = dropdown.querySelector(
+                  ".status-badge-wrapper .status-badge"
+                );
+
+                // Fechar dropdown imediatamente
+                dropdown.classList.remove("open");
+                console.log(
+                  `🔒 MENU ITEM: Dropdown fechado para pauta ${pautaId}`
+                );
+
+                // Atualizar status no banco de dados
+                try {
+                  console.log(
+                    `📡 API CALL: Atualizando pauta ${pautaId} para status "${newText}"`
+                  );
+                  await atualizarStatusPauta(pautaId, newText);
+
+                  // Atualizar visualmente apenas se a requisição foi bem-sucedida
+                  if (mainBadge) {
+                    const oldClasses = Array.from(mainBadge.classList);
+
+                    // Remover todas as classes de status possíveis
+                    mainBadge.classList.remove(
+                      "pendente",
+                      "em-votacao",
+                      "finalizada"
+                    );
+
+                    // Aplicar classe correta baseada no newValue (que vem do data-value)
+                    mainBadge.classList.add(newValue);
+                    mainBadge.textContent = newText.toUpperCase();
+
+                    console.log(
+                      `✅ UI UPDATE: Pauta ${pautaId} - Classes: ${oldClasses.join(
+                        ","
+                      )} → ${Array.from(mainBadge.classList).join(",")}`
+                    );
+                    console.log(
+                      `✅ UI UPDATE: Pauta ${pautaId} - Texto: "${currentStatus}" → "${newText.toUpperCase()}"`
+                    );
+                    console.log(
+                      `✅ UI UPDATE: Pauta ${pautaId} - Classe aplicada: "${newValue}"`
+                    );
+                  }
+
+                  console.log(
+                    `🎉 SUCCESS: Pauta ${pautaId} atualizada com sucesso para ${newValue}`
+                  );
+                } catch (error) {
+                  console.error(
+                    `❌ ERROR: Falha ao atualizar pauta ${pautaId}:`,
+                    error
+                  );
+                  // Não atualizar visualmente se houve erro
+                }
+              });
+            });
+
+            console.log(
+              `✅ DROPDOWN ${
+                index + 1
+              }: Configuração concluída para pauta ${pautaId}`
+            );
+
+            // VERIFICAÇÃO FINAL: Monitorar se a classe open aparece mysteriosamente
+            setTimeout(() => {
+              if (dropdown.classList.contains("open")) {
+                console.error(
+                  `🚨 MYSTERY BUG: Dropdown ${pautaId} ganhou classe 'open' sozinho após configuração!`
+                );
+                console.error(
+                  `🚨 MYSTERY BUG: Classes atuais:`,
+                  Array.from(dropdown.classList)
+                );
+                dropdown.classList.remove("open", "dropdown-up");
+                console.error(
+                  `🚨 MYSTERY BUG: Classe 'open' removida forçadamente`
+                );
+              }
+            }, 50);
+          });
+
+          console.log(
+            `🏁 DROPDOWN: Configuração de todos os ${statusDropdowns.length} dropdowns concluída`
+          );
+        }
+
+        // Função para atualizar contador
+        function atualizarContador(pagination) {
+          const contador = document.getElementById("contador-pautas");
+
+          if (contador && pagination) {
+            const inicio = (pagination.page - 1) * pagination.limit + 1;
+            const fim = Math.min(inicio + pautas.length - 1, pagination.total);
+            contador.textContent = `${inicio}-${fim} de ${pagination.total} pautas`;
+          } else if (contador) {
+            contador.textContent = "0 pautas";
+          }
+        }
+
+        // Função para configurar paginação
+        function configurarPaginacao(pagination) {
+          if (!pagination) return;
+
+          const paginationContainer = document.getElementById(
+            "pagination-container"
+          );
+
+          if (pagination.totalPages <= 1) {
+            paginationContainer.style.display = "none";
+            return;
+          }
+
+          paginationContainer.style.display = "flex";
+
+          createPaginationControls({
+            containerId: "pagination-controls",
+            currentPage: pagination.page,
+            totalItems: pagination.total,
+            itemsPerPage: PAUTAS_PER_PAGE,
+            onPageChange: (newPage) => {
+              currentPage = newPage;
+              const filtros = obterFiltrosAtuais();
+              carregarPautas(currentPage, filtros);
+            },
+          });
+        }
+
+        // Função para atualizar opções do filtro de autor
+        function atualizarFiltroAutor() {
+          if (!autorSelect || !pautas || pautas.length === 0) return;
+
+          // Extrair autores únicos das pautas
+          const autoresUnicos = [...new Set(pautas
+            .map(pauta => pauta.autor)
+            .filter(autor => autor && autor.trim() !== "")
+          )].sort();
+
+          // Limpar opções atuais (exceto "Todos os autores")
+          const optionsContainer = document.querySelector("#filter-autor-wrapper .custom-options");
+          if (!optionsContainer) return;
+
+          // Manter apenas a primeira opção ("Todos os autores")
+          const todasOpcoes = optionsContainer.querySelectorAll('.custom-option');
+          todasOpcoes.forEach((opcao, index) => {
+            if (index > 0) opcao.remove();
+          });
+
+          // Adicionar novas opções de autores
+          autoresUnicos.forEach(autor => {
+            const opcao = document.createElement('div');
+            opcao.className = 'custom-option';
+            opcao.setAttribute('data-value', autor);
+            opcao.innerHTML = `<span>${autor}</span>`;
+            optionsContainer.appendChild(opcao);
+          });
+
+          // Reconfigurar o custom select para reconhecer as novas opções
+          if (autorSelect.reinitialize) {
+            autorSelect.reinitialize();
+          }
+        }
+
+        // Função para aplicar filtros
+        function aplicarFiltros() {
+          const filtros = obterFiltrosAtuais();
+          currentPage = 1;
+          carregarPautas(currentPage, filtros);
+        }
+
+        // Função para obter filtros atuais
+        function obterFiltrosAtuais() {
+          const filtros = {};
+          const filterSearch = document.getElementById("filter-search");
+
+          // Filtro por status
+          const statusValue = statusSelect ? statusSelect.getValue() : "";
+          if (statusValue && statusValue !== "") {
+            filtros.status = statusValue;
+          }
+
+          // Filtro por autor
+          const autorValue = autorSelect ? autorSelect.getValue() : "";
+          if (autorValue && autorValue !== "") {
+            filtros.autor = autorValue;
+          }
+
+          // Filtro por busca de texto
+          if (filterSearch && filterSearch.value.trim() !== "") {
+            filtros.search = filterSearch.value.trim();
+          }
+
+          return filtros;
+        }
+
+        // Função para atualizar status da pauta no banco
+        async function atualizarStatusPauta(pautaId, novoStatus) {
+          try {
+            console.log(
+              `📡 Atualizando status da pauta ${pautaId} para "${novoStatus}"...`
+            );
+
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+              throw new Error("Token não encontrado");
+            }
+
+            const response = await fetch(`/api/pautas/${pautaId}/status`, {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                status: novoStatus,
+              }),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || `Erro ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log(`✅ Status atualizado com sucesso:`, result.data);
+
+            // Status atualizado com sucesso
+
+            return result.data;
+          } catch (error) {
+            console.error("❌ Erro ao atualizar status da pauta:", error);
+            showToast(error.message, "error");
+            throw error;
+          }
+        }
+
+        // Função para mostrar mensagem de erro
+        function mostrarMensagemErro(mensagem) {
+          const tbody = document.querySelector(".pautas-table tbody");
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 2rem; color: var(--accent-red);">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                ${mensagem}
+              </td>
+            </tr>
+          `;
+        }
+
+        // Os filtros agora são gerenciados pelos custom selects
+
+        // Configurar botão de confirmação de remoção
+        const confirmarRemoverBtn = document.getElementById(
+          "confirmar-remover-btn"
+        );
+        if (confirmarRemoverBtn) {
+          confirmarRemoverBtn.addEventListener("click", async (e) => {
+            const pautaId = e.target.dataset.pautaId;
+            if (!pautaId) {
+              showToast("Erro: ID da pauta não encontrado", "error");
+              return;
+            }
+
+            try {
+              // Desabilitar botão e mostrar loading
+              e.target.disabled = true;
+              e.target.innerHTML =
+                '<i class="fa fa-spinner fa-spin"></i> Removendo...';
+
+              const token = localStorage.getItem("authToken");
+              if (!token) {
+                throw new Error("Token não encontrado");
+              }
+
+              const response = await fetch(`/api/pautas/${pautaId}`, {
+                method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              });
+
+              const result = await response.json();
+
+              if (!response.ok) {
+                throw new Error(result.error || `Erro ${response.status}`);
+              }
+
+              // Sucesso
+              showToast(
+                result.message || "Pauta removida com sucesso!",
+                "success"
+              );
+              closeModal("removerPautaModal");
+
+              // Recarregar lista de pautas
+              const filtros = obterFiltrosAtuais();
+              await carregarPautas(currentPage, filtros);
+            } catch (error) {
+              console.error("❌ Erro ao remover pauta:", error);
+
+              // Tratar erro específico de votos registrados
+              if (error.message.includes("votos registrados")) {
+                showToast(
+                  "⚠️ Não é possível remover esta pauta pois ela já possui votos registrados",
+                  "error"
+                );
+              } else {
+                showToast(`Erro ao remover pauta: ${error.message}`, "error");
+              }
+            } finally {
+              // Restaurar botão
+              e.target.disabled = false;
+              e.target.innerHTML =
+                '<i class="fa-solid fa-trash"></i> Excluir Pauta';
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
