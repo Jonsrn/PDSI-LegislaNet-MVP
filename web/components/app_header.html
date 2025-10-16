@@ -1,0 +1,25 @@
+<!-- components/app_header.html -->
+<!-- Este componente representa o cabeçalho para o painel do Administrador da Câmara. -->
+<header class="content-header">
+    <div class="header-title">
+        <!-- O ícone e o título serão preenchidos dinamicamente pela página que carregar o componente -->
+        <i id="header-icon" class="fa-solid"></i>
+        <h2 id="header-title"></h2>
+    </div>
+    <div class="user-profile">
+        <button class="profile-button" id="profileBtn">
+            <div class="profile-avatar">A</div>
+            <div class="profile-info">
+                <span class="name">Admin DEL</span>
+                <span class="email">admin_del@camara.digital</span>
+            </div>
+            <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="#" class="dropdown-item" data-page="perfil"><i class="fa-regular fa-user"></i> Meu Perfil</a>
+            <a href="#" class="dropdown-item"><i class="fa-regular fa-bell"></i> Notificações</a>
+            <div class="dropdown-divider"></div>
+            <a href="../app/login.html" class="dropdown-item"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
+        </div>
+    </div>
+</header>
