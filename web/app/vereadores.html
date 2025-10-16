@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vereadores - Legisla Net</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/forms.css">
+    <link rel="stylesheet" href="../css/modals.css">
+    <link rel="stylesheet" href="../css/customSelect.css">
+    <link rel="stylesheet" href="../css/toast.css">
+    <link rel="stylesheet" href="../css/carregamento.css">
+
+    <style>
+        .main-content { position: relative; }
+        .background-logo-container { position: absolute; top: 0; right: 0; bottom: 0; width: 50%; background-repeat: no-repeat; background-position: center; background-size: contain; opacity: 0.05; pointer-events: none; z-index: 0; }
+        .form-section { position: relative; z-index: 1; }
+        .management-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .management-header h3 { font-size: 1.5rem; }
+        .item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        .item-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; transition: all 0.2s ease-in-out; position: relative; }
+        .item-card:hover { border-color: var(--accent-blue); transform: translateY(-4px); }
+        .item-card-header { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); }
+        .item-card-logo, .item-card-avatar { width: 50px; height: 50px; object-fit: cover; flex-shrink: 0; }
+        .item-card-logo { object-fit: contain; background-color: #fff; border-radius: 8px; padding: 5px; }
+        .item-card-avatar { border-radius: 50%; }
+        .item-card-info h4 { font-size: 1.1rem; }
+        .item-card-info p { color: var(--secondary-text); font-size: 0.9rem; }
+        .item-card-body { flex-grow: 1; }
+        .item-card-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 16px; margin-top: auto; }
+        .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
+        .file-input-wrapper input[type="file"] { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10; }
+        .partido-select-container { display: flex; align-items: center; gap: 16px; }
+        #partido-logo-preview { width: 40px; height: 40px; object-fit: contain; background-color: #fff; border-radius: 6px; padding: 4px; border: 1px solid var(--border-color); visibility: hidden; transition: visibility 0.2s; }
+        #partido-logo-preview.visible { visibility: visible; }
+        
+        /* Container para flags lado a lado */
+        .flags-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        /* Estilos padronizados para todos os flags */
+        .status-badge, .cargo-flag { 
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-align: center;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
+        
+        /* Cores dos flags de status */
+        .status-badge.status-active {
+            background-color: rgba(46, 160, 67, 0.2);
+            color: #71e67f;
+            border: 1px solid rgba(46, 160, 67, 0.4);
+        }
+        .status-badge.status-inactive {
+            background-color: rgba(218, 54, 51, 0.2);
+            color: #f85149;
+            border: 1px solid rgba(218, 54, 51, 0.4);
+        }
+        
+        /* Cores dos flags de cargo */
+        .cargo-flag.presidente {
+            background-color: rgba(255, 159, 10, 0.2);
+            color: #ff9f0a;
+            border: 1px solid rgba(255, 159, 10, 0.4);
+        }
+        .cargo-flag.vice-presidente {
+            background-color: rgba(138, 43, 226, 0.2);
+            color: #9d4edd;
+            border: 1px solid rgba(138, 43, 226, 0.4);
+        }
+        
+        .form-section-title { font-size: 1.25rem; font-weight: 600; color: var(--primary-text); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+        .partido-logo-card { width: 30px; height: 30px; object-fit: contain; background-color: #fff; border-radius: 4px; padding: 2px; border: 1px solid var(--border-color); }
+        .form-select {
+            background-color: var(--hover-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--primary-text) !important;
+        }
+        .toggle-group-modal {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content" id="mainContent">
+            <div id="header-placeholder"></div>
+            <div class="background-logo-container"></div>
+            
+            <section class="form-section fade-in">
+                <div class="management-header">
+                    <h3>Vereadores</h3>
+                    <button id="add-vereador-btn" class="btn btn-primary"><i class="fa fa-plus"></i> Adicionar Vereador</button>
+                </div>
+                <div class="item-grid" id="vereadores-grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="vereadorModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="vereadorModalTitle">Adicionar Vereador</h3>
+                <button class="modal-close" id="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="vereadorForm">
+                    <input type="hidden" id="vereadorId">
+                    <div class="form-group"><label for="nome_parlamentar" data-required="true">Nome Parlamentar</label><input type="text" id="nome_parlamentar" class="form-input" data-validate required><span class="form-error"></span></div>
+                    <div class="form-group"><label for="vereador_email" data-required="true">Email de Acesso</label><input type="email" id="vereador_email" name="vereador_email" class="form-input" placeholder="Digite o email do vereador" data-validate required><span class="form-error"></span></div>
+                    <div class="form-group"><label for="vereador_senha" data-required="true">Senha de Acesso</label><input type="password" id="vereador_senha" name="vereador_senha" class="form-input" placeholder="Digite a senha (mínimo 8 caracteres)" data-validate><span class="form-error"></span></div>
+                    <div class="form-group">
+                        <label for="partido_id" data-required="true">Partido</label>
+                        <div class="custom-select-wrapper" id="partido-custom-select">
+                            <input type="hidden" id="partido_id" name="partido_id" required>
+                            <div class="custom-select-trigger">
+                                <span>Selecione um partido...</span>
+                            </div>
+                            <div class="custom-options"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cargos</label>
+                        <div class="toggle-group-modal">
+                            <div class="toggle-item">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="is_presidente">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Presidente</span>
+                            </div>
+                            <div class="toggle-item">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="is_vice_presidente">
+                                    <span class="slider"></span>
+                                </label>
+                                <span>Vice-Presidente</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><label data-required="true">Foto do Vereador</label><input type="file" id="foto_url_vereador" class="form-input" accept="image/*" data-validate required><span class="form-error"></span></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="modal-cancel-btn">Cancelar</button>
+                <button type="submit" form="vereadorForm" class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação de troca de cargo -->
+    <div class="modal-overlay" id="cargoConfirmModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">Transferir Cargo</h3>
+                <button class="modal-close" id="cargo-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-orange); font-size: 1.5rem;"></i>
+                    <div>
+                        <h4 style="margin: 0; color: var(--primary-text);">Confirmação Necessária</h4>
+                        <p style="margin: 4px 0 0 0; color: var(--secondary-text);">Esta ação irá alterar a estrutura de cargos da câmara.</p>
+                    </div>
+                </div>
+                <div style="background-color: var(--hover-bg); padding: 16px; border-radius: 8px; border-left: 4px solid var(--accent-orange);">
+                    <p id="cargo-message" style="margin: 0; color: var(--primary-text);"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cargo-cancel-btn">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="cargo-confirm-btn">Confirmar Transferência</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="../js/formValidator.js"></script>
+    <script src="../js/global.js"></script>
+    <script src="../js/forms.js"></script>
+    <script src="../js/modals.js"></script>
+    <script src="../js/customSelect.js"></script>
+    <script src="../js/toast.js"></script>
+    <script src="../js/carregamento.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) { window.location.href = '/app/login.html'; return; }
+
+        await initLayout({ title: 'Vereadores', icon: 'fa-users', navActive: 'nav-vereadores' });
+        
+        setupModalEvents();
+        setupValidationForModal();
+        
+        // Configurar event listeners para garantir que apenas um cargo seja selecionado
+        setupCargoToggleLogic();
+        console.log('Event listeners configurados para cargos mutuamente exclusivos');
+        
+        // Configurar validação em tempo real após carregar a página
+        setupRealTimeValidation();
+        
+        await initPartidoCustomSelect(authToken);
+        await loadVereadores(authToken);
+
+        document.getElementById('add-vereador-btn').addEventListener('click', () => openAddVereadorModal());
+        document.getElementById('vereadorForm').addEventListener('submit', (e) => handleVereadorFormSubmit(e, authToken));
+    });
+
+    // FUNÇÃO PARA DEFINIR REGRAS DE VALIDAÇÃO COMPLETAS
+    function setupValidationForModal() {
+        if (typeof formValidator === 'undefined') {
+            console.error('formValidator.js não foi carregado.');
+            return;
+        }
+
+        // Define as regras para todos os campos do modal
+        formValidator
+            .setRules('nome_parlamentar', {
+                required: true,
+                nomeParlamentar: true,
+                minLength: 2,
+                maxLength: 100
+            })
+            .setRules('vereador_email', {
+                required: true,
+                email: true,
+                maxLength: 255
+            })
+            .setRules('vereador_senha', {
+                required: true,
+                strongPassword: true,
+                minLength: 8,
+                maxLength: 128
+            })
+            .setRules('partido_id', {
+                required: true,
+                custom: (value) => (!value ? "Selecione um partido" : null)
+            })
+            .setRules('foto_url_vereador', {
+                required: true,
+                custom: (value, element) => {
+                    const isEditing = !!document.getElementById('vereadorId').value;
+                    if (!isEditing && (!element.files || element.files.length === 0)) {
+                        return "Selecione uma foto para o vereador";
+                    }
+                    return null;
+                }
+            });
+            
+        // Configurar validação em tempo real para todos os campos
+        setupRealTimeValidation();
+    }
+
+    function setupModalEvents() {
+        const closeBtn = document.getElementById('modal-close-btn');
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+        
+        closeBtn.addEventListener('click', () => { closeModal('vereadorModal'); });
+        cancelBtn.addEventListener('click', () => { closeModal('vereadorModal'); });
+    }
+
+    // Variável global para armazenar os vereadores
+    let currentVereadores = [];
+
+    // Função para configurar lógica de cargos mutuamente exclusivos
+    function setupCargoToggleLogic() {
+        const presidenteCheckbox = document.getElementById('is_presidente');
+        const viceCheckbox = document.getElementById('is_vice_presidente');
+        
+        if (presidenteCheckbox && viceCheckbox) {
+            presidenteCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    viceCheckbox.checked = false;
+                    console.log('👑 Cargo Presidente selecionado - Vice-Presidente desmarcado');
+                }
+            });
+            
+            viceCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    presidenteCheckbox.checked = false;
+                    console.log('🤵 Cargo Vice-Presidente selecionado - Presidente desmarcado');
+                }
+            });
+            
+            console.log('⚙️ Event listeners configurados para cargos mutuamente exclusivos');
+        } else {
+            console.warn('⚠️ Não foi possível encontrar os checkboxes de cargo');
+        }
+    }
+    
+    // Função para configurar validação em tempo real
+    function setupRealTimeValidation() {
+        const fields = [
+            { id: 'nome_parlamentar', name: 'nome_parlamentar' },
+            { id: 'vereador_email', name: 'vereador_email' },
+            { id: 'vereador_senha', name: 'vereador_senha' },
+            { id: 'partido_id', name: 'partido_id' },
+            { id: 'foto_url_vereador', name: 'foto_url_vereador' }
+        ];
+        
+        fields.forEach(field => {
+            const element = document.getElementById(field.id);
+            if (element) {
+                const eventType = field.id === 'foto_url_vereador' ? 'change' : 'blur';
+                
+                element.addEventListener(eventType, function() {
+                    if (typeof formValidator !== 'undefined') {
+                        formValidator.validateField(field.name, this.value || this);
+                    }
+                });
+                
+                // Também validar em tempo real durante digitação (exceto arquivo)
+                if (field.id !== 'foto_url_vereador') {
+                    element.addEventListener('input', function() {
+                        if (typeof formValidator !== 'undefined') {
+                            // Pequeno delay para não validar a cada tecla
+                            clearTimeout(this.validationTimeout);
+                            this.validationTimeout = setTimeout(() => {
+                                formValidator.validateField(field.name, this.value);
+                            }, 500);
+                        }
+                    });
+                }
+            }
+        });
+        
+        console.log('✅ Validação em tempo real configurada');
+    }
+
+    async function validateCargoUnico() {
+        console.log('🔍 validateCargoUnico() chamada');
+        const presidenteCheckbox = document.getElementById('is_presidente');
+        const viceCheckbox = document.getElementById('is_vice_presidente');
+        const currentVereadorId = document.getElementById('vereadorId').value;
+        
+        console.log('Estado atual:', {
+            presidente: presidenteCheckbox?.checked,
+            vice: viceCheckbox?.checked,
+            currentId: currentVereadorId,
+            totalVereadores: currentVereadores.length
+        });
+
+        // Não é necessário verificar conflitos internos - já garantidos pelos event listeners
+
+        // Se nenhum cargo foi selecionado, não há o que validar
+        if (!presidenteCheckbox.checked && !viceCheckbox.checked) {
+            window.cargoParaTransferir = null;
+            return true; // Retorna true para indicar validação OK
+        }
+
+        let cargoSelecionado = '';
+        let cargoAtual = '';
+        
+        if (presidenteCheckbox.checked) {
+            cargoSelecionado = 'presidente';
+            cargoAtual = 'Presidente';
+        }
+        
+        if (viceCheckbox.checked) {
+            cargoSelecionado = 'vice_presidente';
+            cargoAtual = 'Vice-Presidente';
+        }
+
+        // Procurar se já existe alguém com este cargo
+        console.log('🔍 Procurando vereador com cargo:', cargoSelecionado);
+        console.log('🔍 Lista de vereadores:', currentVereadores.map(v => ({
+            id: v.id, 
+            nome: v.nome_parlamentar, 
+            is_presidente: v.is_presidente, 
+            is_vice_presidente: v.is_vice_presidente
+        })));
+        
+        const vereadorComCargo = currentVereadores.find(v => {
+            const temCargo = v[`is_${cargoSelecionado}`] && v.id.toString() !== currentVereadorId;
+            console.log(`🔍 Vereador ${v.nome_parlamentar}: tem cargo ${cargoSelecionado}?`, v[`is_${cargoSelecionado}`], 'ID diferente?', v.id.toString() !== currentVereadorId, 'Resultado:', temCargo);
+            return temCargo;
+        });
+
+        console.log('🔍 Vereador com cargo encontrado:', vereadorComCargo);
+
+        if (vereadorComCargo) {
+            console.log('⚠️ CONFLITO DETECTADO! Mostrando modal...');
+            // Mostrar modal de confirmação
+            const message = `O vereador "${vereadorComCargo.nome_parlamentar}" já ocupa o cargo de ${cargoAtual}. Deseja transferir este cargo para o vereador atual? O cargo será removido de "${vereadorComCargo.nome_parlamentar}".`;
+            
+            return new Promise((resolve) => {
+                showCargoConfirmModal(message, cargoSelecionado, vereadorComCargo.id, presidenteCheckbox, viceCheckbox, resolve);
+            });
+        } else {
+            console.log('✅ Nenhum conflito encontrado');
+            // Não há conflito, limpar qualquer transferência pendente
+            window.cargoParaTransferir = null;
+            return true; // Retorna true para indicar validação OK
+        }
+    }
+
+    function showCargoConfirmModal(message, cargoSelecionado, vereadorAntigoId, presidenteCheckbox, viceCheckbox, validationCallback) {
+        console.log('🚨 showCargoConfirmModal chamada com:', { message, cargoSelecionado, vereadorAntigoId });
+        
+        const modal = document.getElementById('cargoConfirmModal');
+        const messageElement = document.getElementById('cargo-message');
+        const confirmBtn = document.getElementById('cargo-confirm-btn');
+        const cancelBtn = document.getElementById('cargo-cancel-btn');
+        const closeBtn = document.getElementById('cargo-modal-close');
+
+        console.log('🚨 Elementos do modal:', { modal, messageElement, confirmBtn, cancelBtn, closeBtn });
+
+        messageElement.textContent = message;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        console.log('🚨 Modal deveria estar visível agora');
+
+        // Função para fechar o modal
+        const closeModal = () => {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            // Desmarcar o checkbox se cancelou
+            if (cargoSelecionado === 'presidente') {
+                presidenteCheckbox.checked = false;
+            } else {
+                viceCheckbox.checked = false;
+            }
+            // Remover event listeners
+            confirmBtn.removeEventListener('click', confirmHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+            closeBtn.removeEventListener('click', cancelHandler);
+        };
+
+        // Handlers dos botões
+        const confirmHandler = () => {
+            window.cargoParaTransferir = {
+                cargoSelecionado,
+                vereadorAntigoId
+            };
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            // Toast removido - apenas sucesso após salvar
+            // Remover event listeners
+            confirmBtn.removeEventListener('click', confirmHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+            closeBtn.removeEventListener('click', cancelHandler);
+            
+            // Resolver a promise com true (validação OK)
+            if (validationCallback) validationCallback(true);
+        };
+
+        const cancelHandler = () => {
+            closeModal();
+            // Resolver a promise com false (validação cancelada)
+            if (validationCallback) validationCallback(false);
+        };
+
+        // Adicionar event listeners
+        confirmBtn.addEventListener('click', confirmHandler);
+        cancelBtn.addEventListener('click', cancelHandler);
+        closeBtn.addEventListener('click', cancelHandler);
+    }
+
+    if (typeof closeModal === 'undefined') {
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    }
+
+    if (typeof openModal === 'undefined') {
+        window.openModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    }
+
+    async function loadVereadores(token) {
+        const grid = document.getElementById('vereadores-grid');
+        renderLoadingState(grid, 'Carregando vereadores...');
+        try {
+            const response = await fetch(`/api/app/vereadores`, { headers: { 'Authorization': `Bearer ${token}` }});
+            if (!response.ok) throw new Error('Falha ao buscar vereadores');
+            const data = await response.json();
+
+            // Armazenar vereadores globalmente para validação de cargos
+            currentVereadores = data || [];
+
+            if (!data || data.length === 0) { 
+                renderEmptyState(grid, 'Nenhum vereador cadastrado.', 'fa-solid fa-users');
+                return; 
+            }
+            
+            // Resetar display para grid quando há dados
+            grid.innerHTML = '';
+            grid.style.display = 'grid';
+
+            data.forEach(vereador => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                const partidoNome = vereador.partidos ? `${vereador.partidos.nome} (${vereador.partidos.sigla})` : 'Sem partido';
+                
+                let partidoLogoSrc = vereador.partidos?.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(vereador.partidos?.sigla || 'SP')}&background=161B22&color=fff&size=30`;
+                
+                // Gerar flags de cargo
+                let cargoFlags = '';
+                if (vereador.is_presidente) {
+                    cargoFlags += '<span class="cargo-flag presidente">Presidente</span>';
+                }
+                if (vereador.is_vice_presidente) {
+                    cargoFlags += '<span class="cargo-flag vice-presidente">Vice-Presidente</span>';
+                }
+                
+                card.innerHTML = `
+                    <div class="item-card-header">
+                        <img src="${vereador.foto_url || 'https://ui-avatars.com/api/?name='+encodeURIComponent(vereador.nome_parlamentar)+'&background=random&color=fff'}" alt="Foto de ${vereador.nome_parlamentar}" class="item-card-avatar">
+                        <div class="item-card-info">
+                            <h4>${vereador.nome_parlamentar.toUpperCase()}</h4>
+                            <p style="display: flex; align-items: center; gap: 8px;">
+                                <img src="${partidoLogoSrc}" alt="Logo Partido" class="partido-logo-card" onerror="this.src='https://ui-avatars.com/api/?name=P&background=161B22&color=fff&size=30'">
+                                ${partidoNome}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="item-card-body">
+                        <div class="flags-container">
+                            <span class="status-badge ${vereador.is_active ? 'status-active' : 'status-inactive'}">${vereador.is_active ? 'Ativo' : 'Inativo'}</span>
+                            ${cargoFlags}
+                        </div>
+                    </div>
+                    <div class="item-card-footer">
+                        <button class="btn btn-secondary edit-vereador-btn" ${!vereador.is_active ? 'disabled title="Não é possível editar vereador inativo"' : ''}>Editar</button>
+                        <button class="btn toggle-status-btn" style="background-color: ${vereador.is_active ? 'var(--accent-orange)' : 'var(--accent-green)'}; color: white;" data-vereador-id="${vereador.id}" data-active="${vereador.is_active}">
+                            ${vereador.is_active ? 'Desativar' : 'Ativar'}
+                        </button>
+                    </div>`;
+                grid.appendChild(card);
+                
+                card.querySelector('.edit-vereador-btn').addEventListener('click', () => {
+                    if (!vereador.is_active) {
+                        showToast('Não é possível editar vereador inativo. Ative o vereador primeiro.', 'error');
+                        return;
+                    }
+                    openEditVereadorModal(vereador);
+                });
+                card.querySelector('.toggle-status-btn').addEventListener('click', (e) => handleToggleActivation(e, token));
+            });
+        } catch (error) { 
+            console.error(error); 
+            renderErrorState(grid, 'Falha ao carregar vereadores.');
+        }
+    }
+
+    // Variável global para o custom select de partidos
+    let partidoCustomSelect;
+
+    async function initPartidoCustomSelect(token) {
+        try {
+            // Verificar se o elemento existe
+            const wrapper = document.getElementById('partido-custom-select');
+            if (!wrapper) {
+                console.error('Elemento partido-custom-select não encontrado');
+                return;
+            }
+            
+            // Inicializar o CustomSelect
+            partidoCustomSelect = new CustomSelect({
+                wrapperId: 'partido-custom-select',
+                placeholder: 'Selecione um partido...'
+            });
+            
+            console.log('CustomSelect inicializado:', partidoCustomSelect);
+            
+            const response = await fetch('/api/partidos', { headers: { 'Authorization': `Bearer ${token}` }});
+            if (!response.ok) throw new Error('Falha ao buscar partidos');
+            const { data } = await response.json();
+            
+            // Preparar opções para o CustomSelect
+            const options = data.map(partido => ({
+                value: partido.id,
+                text: `${partido.nome} (${partido.sigla})`,
+                image: partido.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(partido.sigla)}&background=161B22&color=fff&size=20`,
+                alt: `Logo ${partido.nome}`
+            }));
+            
+            partidoCustomSelect.populateOptions(options);
+        } catch(error) { 
+            console.error(error); 
+            if (partidoCustomSelect) {
+                partidoCustomSelect.populateOptions([]);
+            }
+        }
+    }
+
+    function openAddVereadorModal() {
+        document.getElementById('vereadorForm').reset();
+        document.getElementById('vereadorId').value = '';
+        document.getElementById('vereadorModalTitle').textContent = 'Adicionar Vereador';
+        document.getElementById('vereador_email').disabled = false;
+        document.getElementById('vereador_email').placeholder = 'Digite o email do vereador';
+        document.getElementById('vereador_email').required = true;
+        document.getElementById('vereador_senha').required = true;
+        document.getElementById('vereador_senha').placeholder = 'Digite a senha (mínimo 8 caracteres)';
+
+        // Para criação, foto é obrigatória
+        document.getElementById('foto_url_vereador').required = true;
+
+        if (partidoCustomSelect) {
+            partidoCustomSelect.reset();
+        }
+        openModal('vereadorModal');
+
+        // Reconfigurar event listeners após abrir modal
+        setupCargoToggleLogic();
+    }
+
+    function openEditVereadorModal(vereador) {
+        document.getElementById('vereadorForm').reset();
+        document.getElementById('vereadorId').value = vereador.id;
+        document.getElementById('vereadorModalTitle').textContent = 'Editar Vereador';
+        document.getElementById('nome_parlamentar').value = vereador.nome_parlamentar;
+        // Definir valor no CustomSelect de partidos
+        if (partidoCustomSelect && vereador.partidos) {
+            partidoCustomSelect.setValue(vereador.partidos.id);
+        } else if (partidoCustomSelect) {
+            partidoCustomSelect.reset();
+        }
+        document.getElementById('is_presidente').checked = vereador.is_presidente;
+        document.getElementById('is_vice_presidente').checked = vereador.is_vice_presidente;
+        
+        document.getElementById('vereador_email').placeholder = "Deixe em branco para não alterar";
+        document.getElementById('vereador_email').required = false;
+
+        document.getElementById('vereador_senha').placeholder = 'Deixe em branco para não alterar';
+        document.getElementById('vereador_senha').required = false;
+
+        // Para edição, foto não é obrigatória
+        document.getElementById('foto_url_vereador').required = false;
+        
+        openModal('vereadorModal');
+        
+        // Reconfigurar event listeners após abrir modal
+        setupCargoToggleLogic();
+    }
+
+    // FUNÇÃO 'handleVereadorFormSubmit' ATUALIZADA COM AS VALIDAÇÕES
+    async function handleVereadorFormSubmit(e, token) {
+        e.preventDefault();
+        
+        // ✅ PRIMEIRA VALIDAÇÃO: Verificar conflitos de cargo ANTES de processar
+        const validationResult = await validateCargoUnico();
+        if (validationResult !== true) {
+            console.log('❌ Validação de cargo falhou ou foi cancelada');
+            return; // Para aqui se a validação falhar ou for cancelada
+        }
+        
+        console.log('✅ Validação de cargo aprovada, continuando com o salvamento...');
+        
+        const id = document.getElementById('vereadorId').value;
+        const isEditing = !!id;
+        
+        const body = {
+            nome_parlamentar: document.getElementById('nome_parlamentar').value,
+            partido_id: document.getElementById('partido_id').value,
+            is_presidente: document.getElementById('is_presidente').checked,
+            is_vice_presidente: document.getElementById('is_vice_presidente').checked
+        };
+
+        if (isEditing) {
+            const emailInput = document.getElementById('vereador_email');
+            const senhaInput = document.getElementById('vereador_senha');
+            const newEmail = emailInput.value;
+            const newSenha = senhaInput.value;
+
+            // Valida o email apenas se um novo valor for inserido
+            if (newEmail) {
+                if (!formValidator.validateField('vereador_email', newEmail)) {
+                    return; // Interrompe se o email for inválido
+                }
+                body.email = newEmail;
+            }
+
+            // Valida a senha apenas se uma nova senha for inserida
+            if (newSenha) {
+                if (!formValidator.validateField('vereador_senha', newSenha)) {
+                    return; // Interrompe se a senha for fraca
+                }
+                body.senha = newSenha;
+            }
+
+        } else {
+            // Lógica de criação (que já possui validação adequada)
+            body.email = document.getElementById('vereador_email').value;
+            body.senha = document.getElementById('vereador_senha').value;
+            if (body.senha && body.senha.length < 6) { showToast('A senha deve ter no mínimo 6 caracteres.', 'error'); return; }
+        }
+
+        // Usar FormData para suportar upload de foto
+        const formData = new FormData();
+        Object.keys(body).forEach(key => {
+            formData.append(key, body[key]);
+        });
+
+        // Adicionar foto se foi selecionada
+        const fotoInput = document.getElementById('foto_url_vereador');
+        if (fotoInput.files.length > 0) {
+            formData.append('foto', fotoInput.files[0]);
+        }
+
+        const url = isEditing ? `/api/app/vereadores/${id}` : `/api/app/vereadores`;
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+            // Processar transferência de cargo se necessário
+            if (window.cargoParaTransferir) {
+                const { cargoSelecionado, vereadorAntigoId } = window.cargoParaTransferir;
+                
+                // Remover cargo do vereador anterior
+                const updateAntigoBody = {};
+                updateAntigoBody[`is_${cargoSelecionado}`] = false;
+                
+                await fetch(`/api/app/vereadores/${vereadorAntigoId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(updateAntigoBody)
+                });
+                
+                // Limpar a transferência após processamento
+                window.cargoParaTransferir = null;
+            }
+            const response = await fetch(url, { 
+                method, 
+                headers: { 'Authorization': `Bearer ${token}` }, 
+                body: formData 
+            });
+            if (!response.ok) { const err = await response.json(); throw new Error(err.details || 'Falha ao salvar.'); }
+            
+            const vereadorNome = document.getElementById('nome_parlamentar').value;
+            const isEditing = !!document.getElementById('vereadorId').value;
+            showToast(`Vereador ${vereadorNome} ${isEditing ? 'atualizado' : 'adicionado'} com sucesso!`, 'success');
+            
+            closeModal('vereadorModal');
+            await loadVereadores(token);
+        } catch(error) { showToast(`Erro: ${error.message}`, 'error'); }
+    }
+
+    
+    
+
+    async function handleToggleActivation(event, token) {
+        const button = event.currentTarget;
+        const vereadorId = button.dataset.vereadorId;
+        const currentStatus = button.dataset.active === 'true';
+        if(!confirm(`Deseja ${currentStatus ? 'DESATIVAR' : 'REATIVAR'} este acesso?`)) return;
+
+        try {
+            const response = await fetch(`/api/app/vereadores/${vereadorId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ is_active: !currentStatus }) });
+            if (!response.ok) throw new Error('Falha ao atualizar status.');
+            
+            showToast(`Vereador ${currentStatus ? 'desativado' : 'ativado'} com sucesso!`, 'success');
+            await loadVereadores(token);
+        } catch(error) { showToast(`Erro: ${error.message}`, 'error'); }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerenciar Sessões - Legisla Net</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/forms.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link rel="stylesheet" href="../css/modals.css" />
+    <link rel="stylesheet" href="../css/carregamento.css" />
+    <link rel="stylesheet" href="../css/customSelect.css" />
+    <link rel="stylesheet" href="../css/pagination.css" />
+    <script src="../js/global.js"></script>
+    <script src="../js/carregamento.js"></script>
+    <script src="../js/customSelect.js"></script>
+    <script src="../js/pagination.js"></script>
+
+    <style>
+      /* Estilos gerais da página (filtros, cabeçalho) permanecem os mesmos */
+      /* DEPOIS */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        flex-shrink: 0; /* ADICIONAR ESTA LINHA */
+      }
+      .filters-section {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 24px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 16px;
+        align-items: end;
+        flex-shrink: 0; /* ADICIONAR ESTA LINHA */
+      }
+
+      /* === SESSÕES GRID REESTRUTURADO === */
+      .sessoes-grid-wrapper {
+        flex: 1; /* OCUPA O ESPAÇO DISPONÍVEL */
+        min-height: 200px; /* Altura mínima para evitar colapso */
+        margin-bottom: 32px; /* Espaçamento inferior */
+      }
+
+      #sessoes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+      }
+
+      /* === CONTENT SECTION ESPECÍFICA === */
+      .content-section {
+        flex: 1; /* PERMITE QUE ESTA SEÇÃO CRESÇA */
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* --- MODIFICAÇÕES NOS CARDS DE SESSÃO --- */
+
+      .session-card {
+        /* 1. background-color alterado para --card-bg para combinar com o resto do admin */
+        background-color: var(--card-bg);
+        padding: 24px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        min-height: 250px; /* Altura mínima para acomodar a lista de pautas */
+        position: relative; /* Necessário para posicionar o status badge */
+        overflow: hidden; /* Garante que o badge não vaze */
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      /* Novo container para o cabeçalho do card */
+      .session-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px; /* Pequeno espaçamento abaixo */
+      }
+
+      .session-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--accent-blue);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .session-card:hover .session-title {
+        color: var(--accent-blue);
+      }
+
+      .session-date {
+        color: var(--accent-gold);
+        font-weight: 600;
+        margin-bottom: 0px;
+      }
+      /* NOVO ESTILO */
+      .session-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: var(--primary-text);
+        padding-right: 100px; /* Espaço para o status badge */
+        min-height: 2.5em; /* Garante espaço para até 2 linhas, padronizando a altura */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s ease;
+      }
+      /* O .session-type foi removido */
+
+      /* 2. Status badge reposicionado e com tamanho fixo */
+      /* Status badge modificado */
+      .status-badge {
+        /* Removemos o posicionamento absoluto */
+        display: inline-block;
+        padding: 3px 10px; /* Dimensões reduzidas */
+        border-radius: 99px;
+        font-weight: 600;
+        font-size: 0.7rem; /* Fonte reduzida */
+        text-align: center;
+        white-space: nowrap;
+        text-transform: uppercase;
+        border: 1px solid;
+        /* Removemos a margem que não é mais necessária */
+      }
+      /* 3. Cores dos status baseadas no cadastro_de_pautas.html */
+      .status-badge.agendada {
+        background-color: rgba(240, 227, 51, 0.2);
+        color: rgb(233, 241, 110);
+        border-color: rgb(121, 128, 35);
+      }
+      .status-badge.em-andamento {
+        background-color: rgba(88, 166, 255, 0.2);
+        color: aqua;
+        border-color: rgba(88, 166, 255, 0.5);
+      }
+      .status-badge.finalizada {
+        background-color: rgba(46, 160, 67, 0.2);
+        color: #71e67f;
+        border-color: rgba(46, 160, 67, 0.5);
+      }
+
+      /* 4. Placeholder para a lista de pautas */
+      /* NOVO ESTILO */
+      /* Adicione este novo estilo para a linha entre as pautas */
+      .session-pautas-item + .session-pautas-item {
+        border-top: 1px solid var(--border-color);
+        margin-top: 8px;
+        padding-top: 8px;
+      }
+      .session-pautas-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--secondary-text);
+        margin-bottom: 8px;
+      }
+      .session-pautas-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 80px; /* Altura fixa para a lista */
+        overflow: hidden;
+      }
+      .session-pautas-item {
+        color: var(--secondary-text);
+        font-size: 0.875rem;
+        padding: 4px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Limita o texto para não quebrar o layout */
+      }
+
+      /* NOVO ESTILO */
+      .session-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 16px; /* Adiciona um espaçamento acima dos botões */
+      }
+      .session-actions .btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+      .session-actions .btn.btn-secondary {
+        background-color: var(--secondary-bg) !important;
+        color: var(--primary-text) !important;
+        border-color: var(--border-color) !important;
+      }
+
+      /* Modifique os controles para ficarem visíveis dentro do container */
+      .empty-state,
+      .loading-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: var(--secondary-text);
+      }
+
+      /* === RESPONSIVIDADE ESPECÍFICA === */
+      @media (max-width: 768px) {
+        .filters-section {
+          grid-template-columns: 1fr;
+        }
+
+        /* ADICIONAR ESTAS REGRAS */
+        .page-content-wrapper {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .pagination-container {
+          padding: 16px;
+        }
+
+        .session-card {
+          max-width: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="sidebar-placeholder"></div>
+      <main class="main-content" id="mainContent">
+        <div id="header-placeholder"></div>
+
+        <div class="page-content-wrapper">
+          <div class="content-area">
+            <section class="content-section fade-in">
+              <div class="page-header">
+                <h2>Sessões Legislativas</h2>
+                <a
+                  href="/app/nova_sessao.html"
+                  class="btn btn-primary"
+                  style="text-decoration: none"
+                >
+                  <i class="fa-solid fa-plus"></i> Nova Sessão
+                </a>
+              </div>
+
+              <div class="filters-section">
+                <div class="form-group" style="margin: 0">
+                  <label>Tipo</label>
+                  <div class="custom-select-wrapper" id="filter-tipo-wrapper">
+                    <input type="hidden" id="filter-tipo-value" name="tipo" />
+                    <div class="custom-select-trigger">
+                      <span>Todos os tipos</span>
+                    </div>
+                    <div class="custom-options">
+                      <div class="custom-option" data-value="">
+                        <span>Todos os tipos</span>
+                      </div>
+                      <div class="custom-option" data-value="Ordinária">
+                        <span>Ordinária</span>
+                      </div>
+                      <div class="custom-option" data-value="Extraordinária">
+                        <span>Extraordinária</span>
+                      </div>
+                      <div class="custom-option" data-value="Solene">
+                        <span>Solene</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group" style="margin: 0">
+                  <label>Status</label>
+                  <div class="custom-select-wrapper" id="filter-status-wrapper">
+                    <input
+                      type="hidden"
+                      id="filter-status-value"
+                      name="status"
+                    />
+                    <div class="custom-select-trigger">
+                      <span>Todos os status</span>
+                    </div>
+                    <div class="custom-options">
+                      <div class="custom-option" data-value="">
+                        <span>Todos os status</span>
+                      </div>
+                      <div class="custom-option" data-value="Agendada">
+                        <span>Agendada</span>
+                      </div>
+                      <div class="custom-option" data-value="Em Andamento">
+                        <span>Em Andamento</span>
+                      </div>
+                      <div class="custom-option" data-value="Finalizada">
+                        <span>Finalizada</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group" style="margin: 0">
+                  <label for="filter-search">Buscar</label>
+                  <input
+                    type="text"
+                    id="filter-search"
+                    class="form-input"
+                    placeholder="Nome da sessão..."
+                  />
+                </div>
+                <button
+                  type="button"
+                  id="clear-filters"
+                  class="btn btn-secondary"
+                >
+                  <i class="fa-solid fa-filter-circle-xmark"></i> Limpar
+                </button>
+              </div>
+
+              <div class="sessoes-grid-wrapper">
+                <div id="sessoes-grid"></div>
+              </div>
+            </section>
+          </div>
+
+          <div class="pagination-container" id="pagination-container">
+            <div class="pagination-controls" id="pagination-controls"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="modal-overlay" id="delete-modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Confirmar Exclusão</h3>
+          <button class="modal-close" data-close-modal="delete-modal-overlay">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Você tem certeza que deseja excluir a sessão
+            <strong id="delete-session-name"></strong>? Esta ação não pode ser
+            desfeita.
+          </p>
+        </div>
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-close-modal="delete-modal-overlay"
+          >
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+            Sim, Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        try {
+          protectPage();
+        } catch (e) {
+          console.error(e.message);
+          return;
+        }
+
+        const SESSOES_PER_PAGE = 8;
+        let currentPage = 1;
+
+        // --- INICIALIZAÇÃO DOS CUSTOM SELECTS ---
+        // Inicializa o seletor de TIPO e define que a função applyFilters será chamada na seleção.
+        const tipoSelect = new CustomSelect({
+          wrapperId: "filter-tipo-wrapper",
+          placeholder: "Todos os tipos",
+          onSelect: () => applyFilters(),
+        });
+
+        // Inicializa o seletor de STATUS.
+        const statusSelect = new CustomSelect({
+          wrapperId: "filter-status-wrapper",
+          placeholder: "Todos os status",
+          onSelect: () => applyFilters(),
+        });
+
+        // --- Referências aos outros elementos do DOM ---
+        const grid = document.getElementById("sessoes-grid");
+        const paginationControls = document.getElementById(
+          "pagination-controls"
+        );
+        const filterSearch = document.getElementById("filter-search");
+        const clearFiltersBtn = document.getElementById("clear-filters");
+
+        const deleteModal = {
+          overlay: document.getElementById("delete-modal-overlay"),
+          sessionName: document.getElementById("delete-session-name"),
+          confirmBtn: document.getElementById("confirm-delete-btn"),
+        };
+
+        const fetchSessoes = async (page = 1, filters = {}) => {
+          renderLoadingState(grid, "Carregando sessões...");
+
+          try {
+            const authToken = localStorage.getItem("authToken");
+            const params = new URLSearchParams({
+              page,
+              limit: SESSOES_PER_PAGE,
+              sortBy: 'data_sessao',
+              sortOrder: 'desc',
+              ...filters,
+            });
+
+            const response = await fetch(`/api/sessoes?${params}`, {
+              headers: { Authorization: `Bearer ${authToken}` },
+            });
+
+            if (!response.ok) throw new Error("Falha ao buscar as sessões.");
+
+            const result = await response.json();
+
+            renderSessoes(result.data);
+
+            const paginationContainer = document.getElementById(
+              "pagination-container"
+            );
+            paginationContainer.style.display = "flex"; // MUDANÇA AQUI
+
+            createPaginationControls({
+              containerId: "pagination-controls",
+              currentPage: page,
+              totalItems: result.pagination.totalItems,
+              itemsPerPage: SESSOES_PER_PAGE,
+              onPageChange: (newPage) => {
+                currentPage = newPage;
+                const currentFilters = {
+                  tipo: tipoSelect.getValue(),
+                  status: statusSelect.getValue(),
+                  search: filterSearch.value.trim(),
+                };
+                fetchSessoes(currentPage, currentFilters);
+              },
+            });
+          } catch (error) {
+            console.error("Erro ao carregar sessões:", error); // MANTIDO
+            renderErrorState(grid, error.message);
+          }
+        };
+
+        const renderSessoes = (sessoes) => {
+          const grid = document.getElementById("sessoes-grid");
+          if (!grid) {
+            console.error("Elemento #sessoes-grid não encontrado!"); // MANTIDO
+            return;
+          }
+
+          grid.style.display = "grid";
+
+          if (!sessoes || sessoes.length === 0) {
+            renderEmptyState(
+              grid,
+              "Nenhuma sessão encontrada com os filtros atuais.",
+              "fa-solid fa-calendar-xmark"
+            );
+            return;
+          }
+
+          grid.innerHTML = "";
+          sessoes.forEach((sessao) => {
+            const card = document.createElement("div");
+            card.className = "session-card";
+
+            const dataDaSessao = new Date(sessao.data_sessao);
+            // NOVO CÓDIGO
+            const diaMes = dataDaSessao.toLocaleDateString("pt-BR", {
+              day: "numeric",
+              month: "long",
+            });
+            const ano = dataDaSessao.getFullYear();
+            const parteHora = dataDaSessao.toLocaleTimeString("pt-BR", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            });
+            const dataFormatada = `${diaMes}, ${ano} - ${parteHora}`;
+
+            const statusClass = sessao.status
+              .toLowerCase()
+              .replace(/\s+/g, "-");
+
+            // NOVO CÓDIGO - COM A SEÇÃO DE PAUTAS
+            card.innerHTML = `
+                        <div>
+                            <div class="session-card-header">
+                                <div class="session-date">${dataFormatada}</div>
+                                <div class="status-badge ${statusClass}">${sessao.status}</div>
+                            </div>
+                            <h3 class="session-title">${sessao.nome}</h3>
+
+                            <div>
+                                <h4 class="session-pautas-title">PAUTAS EM DESTAQUE</h4>
+                                <ul class="session-pautas-list">
+                                    <li class="session-pautas-item">Placeholder: Votação do orçamento municipal 2026</li>
+                                    <li class="session-pautas-item">Placeholder: Análise do Projeto de Lei 046/2025</li>
+                                </ul>
+                            </div>
+                            </div>
+
+                        <div class="session-actions">
+                            <button class="btn btn-secondary edit-btn" data-id="${sessao.id}">Editar</button>
+                            <button class="btn btn-danger delete-btn" data-id="${sessao.id}" data-nome="${sessao.nome}">Remover</button>
+                        </div>
+                    `;
+
+            grid.appendChild(card);
+          });
+        };
+
+        const openModal = (overlay) => overlay.classList.add("visible");
+        const closeModal = (overlay) => overlay.classList.remove("visible");
+
+        const openDeleteModal = (id, nome) => {
+          deleteModal.sessionName.textContent = nome;
+          deleteModal.confirmBtn.dataset.id = id;
+          openModal(deleteModal.overlay);
+        };
+
+        const handleDeleteConfirm = async (event) => {
+          const id = event.target.dataset.id;
+          const authToken = localStorage.getItem("authToken");
+          const submitButton = event.target;
+          submitButton.disabled = true;
+          submitButton.innerHTML =
+            '<i class="fa fa-spinner fa-spin"></i> Removendo...';
+          try {
+            const response = await fetch(`/api/sessoes/${id}`, {
+              method: "DELETE",
+              headers: { Authorization: `Bearer ${authToken}` },
+            });
+            if (!response.ok) {
+              const err = await response.json();
+              throw new Error(err.details || "Falha ao remover a sessão.");
+            }
+            showToast("Sessão removida com sucesso!", "success");
+            closeModal(deleteModal.overlay);
+            fetchSessoes(currentPage, {
+              tipo: tipoSelect.getValue(),
+              status: statusSelect.getValue(),
+              search: filterSearch.value.trim(),
+            });
+          } catch (error) {
+            showToast(`Erro: ${error.message}`, "error");
+          } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Sim, Excluir";
+          }
+        };
+
+        const applyFilters = () => {
+          const currentFilters = {
+            tipo: tipoSelect.getValue(),
+            status: statusSelect.getValue(),
+            search: filterSearch.value.trim(),
+          };
+          currentPage = 1;
+          fetchSessoes(currentPage, currentFilters);
+        };
+
+        let searchTimeout;
+        filterSearch.addEventListener("input", () => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(applyFilters, 500);
+        });
+
+        clearFiltersBtn.addEventListener("click", () => {
+          tipoSelect.reset();
+          statusSelect.reset();
+          filterSearch.value = "";
+          applyFilters();
+        });
+
+        grid.addEventListener("click", (event) => {
+          const button = event.target.closest("button");
+          if (!button) return;
+          if (button.classList.contains("edit-btn")) {
+            window.location.href = `/app/editar_sessao.html?id=${button.dataset.id}`;
+          }
+          if (button.classList.contains("delete-btn")) {
+            openDeleteModal(button.dataset.id, button.dataset.nome);
+          }
+        });
+        deleteModal.confirmBtn.addEventListener("click", handleDeleteConfirm);
+
+        document.querySelectorAll("[data-close-modal]").forEach((btn) => {
+          btn.addEventListener("click", () =>
+            closeModal(document.getElementById(btn.dataset.closeModal))
+          );
+        });
+        document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+          overlay.addEventListener("click", (event) => {
+            if (event.target === overlay) closeModal(overlay);
+          });
+        });
+
+        // Inicialização
+        await initLayout({
+          title: "Gerenciar Sessões",
+          icon: "fa-calendar-days",
+          navActive: "nav-sessoes",
+        });
+        fetchSessoes(currentPage, {});
+      });
+    </script>
+  </body>
+</html>
