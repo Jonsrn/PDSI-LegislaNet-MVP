@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Legisla Net</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/pagination.css" />
+    <link rel="stylesheet" href="../css/carregamento.css" />
+
+    <style>
+      /* ESTILOS ESPECÍFICOS DO DASHBOARD */
+
+      .filters {
+        margin-bottom: 24px;
+        flex-shrink: 0;
+      }
+
+      .filter-button {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--primary-text);
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      /* === ESTRUTURA DE PÁGINA COMO SESSÕES === */
+      .page-content-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .content-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .content-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .pautas-grid-wrapper {
+        flex: 1;
+        min-height: 200px;
+        margin-bottom: 32px;
+        padding: 0 24px;
+      }
+
+      /* Responsividade */
+      @media (max-width: 768px) {
+        .page-content-wrapper {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        .pagination-container {
+          padding: 16px;
+        }
+      }
+
+      .pautas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 24px;
+        flex-grow: 1;
+      }
+
+      .pauta-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+      }
+
+      .pauta-card {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        transition: border-color 0.2s, transform 0.2s;
+        width: 100%;
+      }
+      .pauta-card:hover {
+        border-color: var(--accent-blue);
+        transform: translateY(-4px);
+      }
+
+      /* Cabeçalho do card da pauta */
+      .pauta-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+      }
+
+      .pauta-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+        padding-right: 100px; /* Espaço para o badge simbólico */
+        min-height: 2.5em; /* Garante espaço para até 2 linhas */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1; /* Ocupa o espaço disponível */
+      }
+
+      .pauta-description {
+        color: var(--secondary-text);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        flex-grow: 1;
+        margin: 0;
+      }
+
+      .pauta-details {
+        font-size: 0.875rem;
+        color: var(--secondary-text);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .pauta-detail-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .pauta-detail-label {
+        font-weight: 600;
+        color: var(--primary-text);
+        min-width: 80px;
+      }
+      
+      .pauta-detail-value {
+        color: var(--secondary-text);
+        text-align: right;
+      }
+
+      /* Status badges */
+      .status-badge-new {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+      }
+      
+      .status-badge-new.pendente {
+        background-color: rgba(240, 227, 51, 0.2);
+        color: rgb(233, 241, 110);
+        border: 1px solid rgba(240, 227, 51, 0.4);
+      }
+      
+      .status-badge-new.em-votacao {
+        background-color: rgba(88, 166, 255, 0.2);
+        color: aqua;
+        border: 1px solid rgba(88, 166, 255, 0.4);
+      }
+      
+      .status-badge-new.finalizada {
+        background-color: rgba(46, 160, 67, 0.2);
+        color: #71e67f;
+        border: 1px solid rgba(46, 160, 67, 0.4);
+      }
+
+      /* Situação badges */
+      .situacao-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-align: center;
+        white-space: nowrap;
+      }
+      
+      .situacao-badge.aprovado {
+        background-color: rgba(46, 160, 67, 0.2);
+        color: #71e67f;
+        border: 1px solid rgba(46, 160, 67, 0.4);
+      }
+      
+      .situacao-badge.reprovado {
+        background-color: rgba(218, 54, 51, 0.2);
+        color: #f85149;
+        border: 1px solid rgba(218, 54, 51, 0.4);
+      }
+      
+      .situacao-badge.nao-votada {
+        background-color: rgba(108, 117, 125, 0.2);
+        color: #adb5bd;
+        border: 1px solid rgba(108, 117, 125, 0.4);
+      }
+
+      .votos-count {
+        border-top: 1px solid var(--border-color);
+        padding-top: 16px;
+        font-size: 0.875rem;
+        color: var(--secondary-text);
+      }
+
+      /* Badge para votação simbólica - seguindo padrão de sessões */
+      .badge-simbolica {
+        display: inline-block;
+        padding: 3px 10px; /* Dimensões como no sessões */
+        border-radius: 99px; /* Bordas bem arredondadas */
+        font-weight: 600;
+        font-size: 0.7rem; /* Fonte reduzida */
+        text-align: center;
+        white-space: nowrap;
+        text-transform: uppercase;
+        border: 1px solid;
+        background-color: rgba(218, 54, 51, 0.2);
+        color: #f85149;
+        border-color: rgba(218, 54, 51, 0.4);
+        flex-shrink: 0; /* Não encolhe quando há pouco espaço */
+      }
+
+    </style>
+
+    <script src="../js/global.js"></script>
+    <script src="../js/pagination.js"></script>
+    <script src="../js/carregamento.js"></script>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="sidebar-placeholder"></div>
+
+      <main class="main-content" id="mainContent">
+        <div id="header-placeholder"></div>
+
+        <div class="page-content-wrapper">
+          <div class="content-area">
+            <section class="content-section fade-in">
+              <div class="pautas-grid-wrapper">
+                <div class="pautas-grid" id="pautas-grid"></div>
+              </div>
+            </section>
+          </div>
+
+          <div class="pagination-container" id="pagination-container">
+            <div class="pagination-controls" id="pagination-controls"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async () => {
+        // --- 2. PROTEÇÃO DE PÁGINA APLICADA ---
+        // A função `protectPage()` é chamada primeiro. Se o usuário não estiver
+        // logado, será redirecionado e o restante do script não será executado.
+        try {
+          protectPage();
+        } catch (e) {
+          console.error(e.message);
+          return; // Interrompe a execução se não estiver autenticado.
+        }
+
+        // Se a execução continuar, o usuário está autenticado.
+        console.log(
+          "[DASHBOARD] Autenticação verificada. Inicializando a página."
+        );
+
+        initLayout({
+          title: "Dashboard",
+          icon: "fa-table-columns",
+          navActive: "nav-dashboard",
+        });
+
+        // A função `initStatusDropdowns` deve ser chamada se você tiver dropdowns no dashboard.
+        // initStatusDropdowns();
+
+        // Inicializar o carregamento de pautas.
+        await loadPautas();
+      });
+
+      // ==========================================
+      // SISTEMA DE PAUTAS DINÂMICAS (Refatorado)
+      // ==========================================
+
+      let currentPage = 1;
+      const PAUTAS_PER_PAGE = 8;
+
+      async function loadPautas(page = 1) {
+        const grid = document.getElementById("pautas-grid");
+        const paginationContainer = document.getElementById(
+          "pagination-container"
+        );
+        const authToken = localStorage.getItem("authToken");
+
+        // 1. Inicia o estado de carregamento
+        renderLoadingState(grid, "Carregando pautas...");
+        paginationContainer.style.display = "none";
+
+        try {
+          console.log("🔄 [DASHBOARD] Iniciando carregamento de pautas...");
+          
+          const response = await fetch(
+            `/api/pautas?page=${page}&limit=${PAUTAS_PER_PAGE}&sortBy=created_at&sortOrder=desc`,
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          console.log("📡 [DASHBOARD] Response status:", response.status);
+
+          if (response.status === 401) {
+            console.log("❌ [DASHBOARD] Token inválido - redirecionando para login");
+            localStorage.clear();
+            window.location.href = "/app/login.html";
+            return;
+          }
+
+          if (!response.ok) {
+            console.error("❌ [DASHBOARD] Erro na resposta:", response.status, response.statusText);
+            throw new Error(`Falha na comunicação com o servidor.`);
+          }
+
+          const responseData = await response.json();
+          console.log("📦 [DASHBOARD] Dados recebidos da API:", responseData);
+          
+          const { data: allPautas, pagination } = responseData;
+          console.log("📋 [DASHBOARD] Total de pautas recebidas:", allPautas?.length || 0);
+          console.log("📋 [DASHBOARD] Paginação:", pagination);
+
+          if (!allPautas || !Array.isArray(allPautas)) {
+            console.error("❌ [DASHBOARD] Dados de pautas inválidos:", allPautas);
+            throw new Error("Dados de pautas inválidos recebidos do servidor");
+          }
+
+          // Log detalhado das pautas antes do filtro
+          allPautas.forEach((pauta, index) => {
+            console.log(`📄 [DASHBOARD] Pauta ${index + 1}:`, {
+              id: pauta.id,
+              nome: pauta.nome,
+              votacao_simbolica: pauta.votacao_simbolica,
+              status: pauta.status,
+              resultado_votacao: pauta.resultado_votacao
+            });
+          });
+
+          // Manter todas as pautas (incluindo votações simbólicas)
+          const pautas = allPautas;
+          console.log("🔍 [DASHBOARD] Total de pautas a serem exibidas:", pautas.length);
+
+          // Usar paginação original do servidor
+          const filteredPagination = pagination;
+
+          console.log("🎯 [DASHBOARD] Chamando renderPautas com", pautas.length, "pautas");
+          await renderPautas(pautas);
+          
+          // Configurar paginação usando pagination.js
+          const paginationContainer = document.getElementById("pagination-container");
+          if (filteredPagination && filteredPagination.totalPages > 1) {
+            paginationContainer.style.display = "flex";
+            
+            createPaginationControls({
+              containerId: "pagination-controls",
+              currentPage: pagination.page,
+              totalItems: filteredPagination.total,
+              itemsPerPage: PAUTAS_PER_PAGE,
+              onPageChange: (newPage) => {
+                loadPautas(newPage);
+              },
+            });
+          } else {
+            paginationContainer.style.display = "none";
+          }
+        } catch (error) {
+          console.error("Erro ao carregar pautas:", error);
+          // 3. O bloco catch agora apenas chama a função de estado de erro
+          renderErrorState(grid, error.message);
+        }
+      }
+
+      async function renderPautas(pautas) {
+        const grid = document.getElementById("pautas-grid");
+        console.log("🎨 [DASHBOARD] renderPautas chamada com:", pautas?.length || 0, "pautas");
+
+        // Se não houver pautas, chama a função de estado de "vazio"
+        if (!pautas || pautas.length === 0) {
+          console.log("📭 [DASHBOARD] Nenhuma pauta para renderizar - mostrando estado vazio");
+          renderEmptyState(
+            grid,
+            "Nenhuma pauta encontrada.",
+            "fa-solid fa-file-lines"
+          );
+          return;
+        }
+
+        // Se houver pautas, limpa o grid e renderiza os cards
+        console.log("🧹 [DASHBOARD] Limpando grid e renderizando", pautas.length, "cards");
+        grid.innerHTML = "";
+
+        try {
+          // Criar todos os cards em paralelo usando Promise.all
+          const cardPromises = pautas.map(async (pauta, index) => {
+            console.log(`🎴 [DASHBOARD] Criando card ${index + 1} para pauta:`, pauta.nome);
+            try {
+              const card = await createPautaCard(pauta);
+              if (card) {
+                console.log(`✅ [DASHBOARD] Card ${index + 1} criado com sucesso`);
+                return card;
+              } else {
+                console.error(`❌ [DASHBOARD] Card ${index + 1} retornou null/undefined`);
+                return null;
+              }
+            } catch (error) {
+              console.error(`❌ [DASHBOARD] Erro ao criar card ${index + 1}:`, error);
+              return null;
+            }
+          });
+
+          // Aguardar todos os cards serem criados
+          const cards = await Promise.all(cardPromises);
+
+          // Adicionar cards válidos ao grid
+          cards.forEach((card, index) => {
+            if (card) {
+              grid.appendChild(card);
+
+              // Forçar visibilidade do card
+              card.style.display = 'flex';
+              card.style.visibility = 'visible';
+              card.style.opacity = '1';
+
+              console.log(`✅ [DASHBOARD] Card ${index + 1} adicionado ao DOM`);
+            }
+          });
+
+          // Forçar visibilidade do grid e remover classes de loading
+          grid.classList.remove('loading-state', 'error-state', 'empty-state');
+          grid.style.display = 'grid';
+          grid.style.visibility = 'visible';
+          grid.style.opacity = '1';
+
+          // Ativar animação fade-in da seção
+          const contentSection = document.querySelector('.content-section.fade-in');
+          if (contentSection) {
+            contentSection.classList.add('visible');
+            console.log('✨ [DASHBOARD] Seção fade-in ativada');
+          }
+
+          // Log adicional para debug
+          console.log('🔍 [DASHBOARD] Grid classes após limpeza:', Array.from(grid.classList));
+          console.log('🔍 [DASHBOARD] Grid computed styles:', {
+            display: window.getComputedStyle(grid).display,
+            visibility: window.getComputedStyle(grid).visibility,
+            opacity: window.getComputedStyle(grid).opacity
+          });
+
+        } catch (error) {
+          console.error('❌ [DASHBOARD] Erro ao renderizar cards:', error);
+        }
+
+        console.log("🎯 [DASHBOARD] Renderização concluída. Cards no DOM:", grid.children.length);
+
+        // Debug automático após renderização
+        setTimeout(() => {
+          debugLayout();
+        }, 100);
+      }
+
+      async function createPautaCard(pauta) {
+      console.log("🎴 [DASHBOARD] createPautaCard INÍCIO - pauta:", pauta.nome);
+      
+      try {
+        const link = document.createElement("a");
+        link.href = `painel_votacao.html?id=${pauta.id}`;
+        link.className = "pauta-card-link fade-in visible";
+        
+        // Processar dados - Mapeamento correto de status para classes CSS
+        const getStatusClass = (status) => {
+          if (!status) return "pendente";
+          
+          const statusMap = {
+            "pendente": "pendente",
+            "em votação": "em-votacao",
+            "finalizada": "finalizada"
+          };
+          
+          const normalized = status.toLowerCase().trim();
+          const cssClass = statusMap[normalized] || "pendente";
+          
+          return cssClass;
+        };
+        
+        const statusClass = getStatusClass(pauta.status);
+        
+        // Mapear resultado para formato da interface
+        const situacaoMap = {
+          'Aprovada': 'Aprovado',
+          'Reprovada': 'Reprovado', 
+          'Não Votada': 'Não votada'
+        };
+        const situacaoTexto = situacaoMap[pauta.resultado_votacao] || 'Não votada';
+        const situacaoClass = situacaoTexto.toLowerCase().replace(/\s+/g, "-").replace(/ã/g, "a");
+        
+        const dataSessao = pauta.sessoes?.data_sessao
+          ? new Date(pauta.sessoes.data_sessao).toLocaleDateString("pt-BR")
+          : "N/A";
+        
+        // Combinar nome e tipo da sessão
+        const nomeSessao = pauta.sessoes?.nome || "N/A";
+        const tipoSessao = pauta.sessoes?.tipo || "";
+        const sessaoCompleta = tipoSessao ? `${nomeSessao} ${tipoSessao}` : nomeSessao;
+        
+        // Contagem de votos real
+        let totalVotos = 0;
+        let votosTexto = "Carregando votos...";
+
+        // Buscar votos reais se a pauta estiver em votação ou finalizada
+        if (pauta.status?.toLowerCase() === 'em votação' || pauta.status?.toLowerCase() === 'finalizada') {
+          try {
+            const authToken = localStorage.getItem("authToken");
+            const votosResponse = await fetch(`/api/votos/pauta/${pauta.id}`, {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (votosResponse.ok) {
+              const votosData = await votosResponse.json();
+              totalVotos = votosData.estatisticas?.total || 0;
+              votosTexto = totalVotos === 0
+                ? "Nenhum voto registrado"
+                : `${totalVotos} ${totalVotos === 1 ? 'voto registrado' : 'votos registrados'}`;
+            } else {
+              votosTexto = "Erro ao carregar votos";
+            }
+          } catch (error) {
+            console.error('Erro ao buscar votos da pauta:', error);
+            votosTexto = "Erro ao carregar votos";
+          }
+        } else {
+          votosTexto = "Votação não iniciada";
+        }
+        
+        // Badge para votação simbólica (sem ícone, como no template de sessões)
+        const simbolicaBadge = pauta.votacao_simbolica ?
+          '<span class="badge-simbolica">Votação Simbólica</span>' : '';
+
+        link.innerHTML = `
+          <div class="pauta-card">
+            <div class="pauta-card-header">
+              <h3 class="pauta-title">${escapeHtml(pauta.nome)}</h3>
+              ${simbolicaBadge}
+            </div>
+            <p class="pauta-description">${escapeHtml(truncateText(pauta.descricao || "Sem descrição disponível", 120))}</p>
+
+            <div class="pauta-details">
+              <div class="pauta-detail-line">
+                <span class="pauta-detail-label">Autor:</span>
+                <span class="pauta-detail-value">${escapeHtml(pauta.autor || "Não informado")}</span>
+              </div>
+
+              <div class="pauta-detail-line">
+                <span class="pauta-detail-label">Status:</span>
+                <span class="status-badge-new ${statusClass}">${pauta.status || "pendente"}</span>
+              </div>
+
+              <div class="pauta-detail-line">
+                <span class="pauta-detail-label">Situação:</span>
+                <span class="situacao-badge ${situacaoClass}">${situacaoTexto}</span>
+              </div>
+
+              <div class="pauta-detail-line">
+                <span class="pauta-detail-label">Data:</span>
+                <span class="pauta-detail-value">${dataSessao}</span>
+              </div>
+
+              <div class="pauta-detail-line">
+                <span class="pauta-detail-label">Sessão:</span>
+                <span class="pauta-detail-value">${escapeHtml(sessaoCompleta)}</span>
+              </div>
+            </div>
+
+            <div class="votos-count">
+              ${votosTexto}
+            </div>
+          </div>
+        `;
+        
+        console.log("✅ [DASHBOARD] createPautaCard SUCESSO");
+        return link;
+        
+      } catch (error) {
+        console.error("❌ [DASHBOARD] Erro em createPautaCard:", error);
+        return null;
+      }
+    }
+
+
+      function truncateText(text, maxLength) {
+        if (!text || typeof text !== 'string') return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength).trim() + '...';
+      }
+
+      function escapeHtml(text = "") {
+        return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // FUNÇÃO DE DEBUG - adicionar após as outras funções
+      function debugLayout() {
+        console.log('=== DEBUG LAYOUT ===');
+        
+        const grid = document.getElementById('pautas-grid');
+        const cards = document.querySelectorAll('.pauta-card');
+        const links = document.querySelectorAll('.pauta-card-link');
+        
+        console.log('Grid element:', grid);
+        console.log('Grid display:', window.getComputedStyle(grid).display);
+        console.log('Grid visibility:', window.getComputedStyle(grid).visibility);
+        console.log('Grid opacity:', window.getComputedStyle(grid).opacity);
+        console.log('Total cards:', cards.length);
+        console.log('Total links:', links.length);
+        
+        cards.forEach((card, index) => {
+          const styles = window.getComputedStyle(card);
+          console.log(`Card ${index + 1}:`, {
+            display: styles.display,
+            visibility: styles.visibility,
+            opacity: styles.opacity,
+            width: styles.width,
+            height: styles.height,
+            position: styles.position
+          });
+        });
+        
+        // Forçar visibilidade
+        grid.style.display = 'grid';
+        grid.style.visibility = 'visible';
+        grid.style.opacity = '1';
+        
+        cards.forEach(card => {
+          card.style.display = 'flex';
+          card.style.visibility = 'visible';
+          card.style.opacity = '1';
+        });
+        
+        links.forEach(link => {
+          link.style.display = 'flex';
+          link.style.visibility = 'visible';
+          link.style.opacity = '1';
+        });
+      }
+
+    </script>
+  </body>
+</html>
