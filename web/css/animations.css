@@ -1,0 +1,32 @@
+/* =============================================================== */
+/* --- SISTEMA UNIFICADO DE ANIMAÇÕES FADE-IN --- */
+/* =============================================================== */
+
+/* Base para todas as animações */
+.fade-in,
+.animate-on-load,
+.fade-in-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+/* Estado visível */
+.fade-in.visible,
+.animate-on-load.visible,
+.fade-in-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Delays para animação sequencial */
+.fade-in:nth-child(1), .animate-on-load:nth-child(1) { transition-delay: 0.1s; }
+.fade-in:nth-child(2), .animate-on-load:nth-child(2) { transition-delay: 0.2s; }
+.fade-in:nth-child(3), .animate-on-load:nth-child(3) { transition-delay: 0.3s; }
+.fade-in:nth-child(4), .animate-on-load:nth-child(4) { transition-delay: 0.4s; }
+.fade-in:nth-child(5), .animate-on-load:nth-child(5) { transition-delay: 0.5s; }
+
+/* Animações especiais para hero */
+.hero-sequential .animate-on-load:nth-child(1) { transition-delay: 0.2s; }
+.hero-sequential .animate-on-load:nth-child(2) { transition-delay: 0.4s; }
+.hero-sequential .animate-on-load:nth-child(3) { transition-delay: 0.6s; }
