@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TV - Aguardando instruções</title>
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/portal.css" />
+    <!-- small inline favicon to avoid automatic /favicon.ico 404 -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23007acc'/></svg>"
+    />
+    <style>
+      body {
+        background: var(--background-dark);
+        color: var(--primary-text);
+        font-family: Inter, system-ui, sans-serif;
+      }
+      .tv-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        padding: 24px;
+      }
+      /* Increased sizes for TV readability */
+      .camara-name {
+        font-size: 6.5rem; /* Aumentado de 5rem para 6.5rem */
+        font-weight: 800;
+        margin-bottom: 12px;
+        text-align: center;
+        line-height: 1.05;
+      }
+      .camara-logo {
+        width: 360px;
+        height: 360px;
+        object-fit: contain;
+        border-radius: 12px;
+        margin-bottom: 20px;
+      }
+      .status {
+        font-size: 1.6rem;
+        color: var(--secondary-text);
+      }
+      .message {
+        margin-top: 28px;
+        font-size: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Connection badge (top-right) -->
+    <div
+      id="connectionBadge"
+      style="
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #5cb85c;
+        padding: 8px 12px;
+        border-radius: 20px;
+        color: white;
+        font-weight: 600;
+        z-index: 1000;
+        animation: breathe 2s ease-in-out infinite;
+      "
+    >
+      <div id="connectionBadgeText">Conectado</div>
+    </div>
+
+    <style>
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+    </style>
+    <div class="tv-wrap">
+      <img
+        id="brasao"
+        class="camara-logo"
+        src=""
+        alt="Brasão"
+        style="display: none"
+      />
+      <div id="nomeCamara" class="camara-name">Aguardando seleção...</div>
+      <button
+        id="reconnectBtn"
+        style="
+          margin-top: 20px;
+          padding: 8px 12px;
+          border-radius: 8px;
+          border: none;
+          background: var(--accent-green);
+          color: white;
+          cursor: pointer;
+          display: none;
+        "
+      >
+        Reconectar
+      </button>
+    </div>
+
+    <!-- Load Socket.IO client from CDN; if unavailable, dynamically load it before connecting -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+      // Basic logger usage
+      const camaraNameEl = document.getElementById("nomeCamara");
+      const brasaoEl = document.getElementById("brasao");
+      const reconnectBtn = document.getElementById("reconnectBtn");
+      const connectionBadge = document.getElementById("connectionBadge");
+      const connectionBadgeText = document.getElementById(
+        "connectionBadgeText"
+      );
+
+      // Expor socket globalmente para permitir reconexão a partir do botão
+      let tvSocket = null;
+
+      const token = localStorage.getItem("authToken");
+      const urlParams = new URLSearchParams(window.location.search);
+      // Try to load camara info via API using token
+      async function init() {
+        try {
+          if (!token) {
+            console.log("❌ Token não encontrado");
+            return;
+          }
+          const resp = await fetch("/api/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!resp.ok) {
+            console.log("❌ Autenticação falhou");
+            return;
+          }
+          const me = await resp.json();
+          // API returns { user, profile, camara }
+          const camaraId =
+            (me.profile && me.profile.camara_id) || (me.camara && me.camara.id);
+
+          // Corrigir nome da câmara - evitar duplicação
+          if (me.camara && me.camara.nome_camara) {
+            const nomeCamara = me.camara.nome_camara;
+            // Se já contém "Câmara Municipal", usar apenas o nome
+            if (nomeCamara.includes("Câmara Municipal")) {
+              camaraNameEl.textContent = nomeCamara;
+            } else {
+              camaraNameEl.textContent = `Câmara Municipal de ${nomeCamara}`;
+            }
+          } else if (me.profile && me.profile.nome) {
+            const nomeProfile = me.profile.nome;
+            if (nomeProfile.includes("Câmara Municipal")) {
+              camaraNameEl.textContent = nomeProfile;
+            } else {
+              camaraNameEl.textContent = `Câmara Municipal de ${nomeProfile}`;
+            }
+          }
+
+          if (me.camara && me.camara.brasao_url) {
+            brasaoEl.src = me.camara.brasao_url;
+            brasaoEl.style.display = "block";
+          }
+          // Ensure Socket.IO client is available. If not, try to load CDN dynamically.
+          if (typeof io === "undefined") {
+            console.log("📡 Carregando cliente de WebSocket...");
+            await new Promise((resolve, reject) => {
+              const s = document.createElement("script");
+              s.src = "https://cdn.socket.io/4.7.2/socket.io.min.js";
+              s.onload = resolve;
+              s.onerror = () =>
+                reject(new Error("Falha ao carregar script Socket.IO"));
+              document.head.appendChild(s);
+            });
+          }
+
+          // Connect Socket.IO and join tv room for camara
+          tvSocket = io("http://localhost:3000", { auth: { token } });
+          tvSocket.on("connect", () => {
+            console.log("📡 TV conectada ao servidor");
+            connectionBadge.style.background = "#5cb85c";
+            connectionBadgeText.textContent = "Conectado";
+            reconnectBtn.style.display = "none";
+            // Join room (server should handle)
+            if (camaraId) tvSocket.emit("tv:join-camara", { camaraId });
+          });
+          tvSocket.on("disconnect", () => {
+            console.log("📡 TV desconectada do servidor");
+            connectionBadge.style.background = "#d9534f";
+            connectionBadgeText.textContent = "Desconectado";
+            reconnectBtn.style.display = "inline-block";
+          });
+
+          tvSocket.on("tv:mostrar-espera", (data) => {
+            // Corrigir nome da câmara evitando duplicação
+            if (data.camara && data.camara.nome_camara) {
+              const nomeCamara = data.camara.nome_camara;
+              if (nomeCamara.includes("Câmara Municipal")) {
+                camaraNameEl.textContent = nomeCamara;
+              } else {
+                camaraNameEl.textContent = `Câmara Municipal de ${nomeCamara}`;
+              }
+            }
+            if (data.camara && data.camara.brasao_url) {
+              brasaoEl.src = data.camara.brasao_url;
+              brasaoEl.style.display = "block";
+            }
+          });
+
+          tvSocket.on("tv:join-error", (err) => {
+            console.error("❌ Erro ao autenticar TV:", err);
+            connectionBadge.style.background = "#d9534f";
+            connectionBadgeText.textContent = "Erro de Auth";
+            reconnectBtn.style.display = "inline-block";
+            console.warn("tv:join-error", err);
+          });
+
+          reconnectBtn.addEventListener("click", () => {
+            try {
+              if (tvSocket) {
+                console.log("🔄 Tentando reconectar...");
+                connectionBadge.style.background = "#ffd24d";
+                connectionBadgeText.textContent = "Reconectando...";
+                tvSocket.connect();
+              } else {
+                window.location.reload();
+              }
+            } catch (e) {
+              console.error("Erro ao reconectar:", e);
+              window.location.reload();
+            }
+          });
+
+          tvSocket.on("tv:iniciar-votacao", (data) => {
+            // Redirect to voting template and pass pauta id
+            const pautaId = data.pauta?.id;
+            const url = `/tv/votacao_tv.html?pauta=${pautaId}`;
+            window.location.href = url;
+          });
+        } catch (err) {
+          console.error("❌ Erro ao iniciar TV:", err);
+          console.error("TV espera init error", err);
+        }
+      }
+      init();
+    </script>
+  </body>
+</html>
