@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Votação Pública - Legisla Net</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+
+    <link rel="stylesheet" href="../css/portal.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/global.css">
+
+    <style>
+        /* ESTILOS ESPECÍFICOS DA VOTAÇÃO PÚBLICA */
+
+        /* Layout da Votação Pública */
+        .votacao-publica-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+            flex-grow: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .info-column, .votantes-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .info-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .info-card h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--secondary-text);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-card p, .info-card a {
+            font-size: 1rem;
+            color: var(--primary-text);
+            line-height: 1.5;
+        }
+
+        .info-card a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+
+        /* Estatísticas de Votação */
+        .stats-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--background-light) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stats-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-text);
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .vote-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px 16px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item.favor {
+            background-color: rgba(46, 160, 67, 0.1);
+            border-color: rgba(46, 160, 67, 0.3);
+        }
+
+        .stat-item.favor::before {
+            background-color: var(--accent-green);
+        }
+
+        .stat-item.against {
+            background-color: rgba(248, 81, 73, 0.1);
+            border-color: rgba(248, 81, 73, 0.3);
+        }
+
+        .stat-item.against::before {
+            background-color: var(--accent-red);
+        }
+
+        .stat-item.abstention {
+            background-color: rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .stat-item.abstention::before {
+            background-color: var(--accent-gold);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-item.favor .stat-number { color: var(--accent-green); }
+        .stat-item.against .stat-number { color: var(--accent-red); }
+        .stat-item.abstention .stat-number { color: var(--accent-gold); }
+
+        .stat-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--secondary-text);
+        }
+
+        .stat-icon {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .stat-item.favor .stat-icon { color: var(--accent-green); }
+        .stat-item.against .stat-icon { color: var(--accent-red); }
+        .stat-item.abstention .stat-icon { color: var(--accent-gold); }
+
+        .total-votes {
+            text-align: center;
+            padding: 16px;
+            background-color: var(--background-dark);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .total-votes .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            display: block;
+        }
+
+        .total-votes .label {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Grid de Votantes */
+        .votantes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .votante-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .votante-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .votante-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            min-height: 40px;
+        }
+
+        .votante-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .votante-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid var(--accent-blue);
+        }
+
+        .votante-detalhes {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .votante-name {
+            font-weight: 600;
+            color: var(--primary-text);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.2;
+        }
+
+        .partido-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .partido-logo {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            object-fit: contain;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 2px;
+        }
+
+        .partido-sigla {
+            font-size: 0.75rem;
+            color: var(--secondary-text);
+            font-weight: 500;
+            padding: 2px 6px;
+            background-color: rgba(88, 166, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 99px;
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
+
+        .tag-presidente {
+            background-color: rgba(240, 136, 51, 0.2);
+            color: var(--accent-orange);
+            border: 1px solid rgba(240, 136, 51, 0.3);
+        }
+
+        .voto-display {
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .voto-sim { background-color: var(--accent-green); }
+        .voto-nao { background-color: var(--accent-red); }
+        .voto-abstencao { background-color: var(--accent-orange); }
+
+        .votante-timestamp {
+            font-size: 0.75rem;
+            color: var(--secondary-text);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* Estado vazio para votantes */
+        .empty-votantes {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 48px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .empty-votantes i {
+            font-size: 3rem;
+            color: var(--secondary-text);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .empty-votantes h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-text);
+            margin-bottom: 8px;
+        }
+
+        .empty-votantes p {
+            color: var(--secondary-text);
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        /* Badges de Status */
+        .badge-aprovado {
+            background-color: rgba(46, 160, 67, 0.2);
+            color: #71e67f;
+            border: 1px solid rgba(46, 160, 67, 0.4);
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-reprovado {
+            background-color: rgba(218, 54, 51, 0.2);
+            color: #f85149;
+            border: 1px solid rgba(218, 54, 51, 0.4);
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-em-votacao {
+            background-color: rgba(88, 166, 255, 0.2);
+            color: #58a6ff;
+            border: 1px solid rgba(88, 166, 255, 0.4);
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-pendente {
+            background-color: rgba(240, 227, 51, 0.2);
+            color: #d4af37;
+            border: 1px solid rgba(240, 227, 51, 0.4);
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-finalizada {
+            background-color: rgba(46, 160, 67, 0.2);
+            color: #71e67f;
+            border: 1px solid rgba(46, 160, 67, 0.4);
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-nao-votada {
+            background-color: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.4);
+            padding: 6px 12px;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Botão de Voltar */
+        .btn-voltar {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background-color: var(--accent-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 24px;
+        }
+
+        .btn-voltar:hover {
+            background-color: #4c94ff;
+            transform: translateY(-1px);
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .votacao-publica-layout {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+
+            .vote-stats {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .votantes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="selecionar_camara.html" class="nav-logo">
+                <svg viewBox="0 0 44 40" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="var(--accent-blue)" /><stop offset="100%" stop-color="var(--accent-green)" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#logoGradient)" d="M 8 5 V 35 H 14 V 5 Z M 19 5 V 35 H 25 V 5 Z M 30 5 V 35 H 36 V 5 Z M 5 35 H 39 V 40 H 5 Z" />
+                </svg>
+                <span>Legisla Net</span>
+            </a>
+            <div class="nav-menu-wrapper">
+                <div class="camara-info-nav">
+                    <i class="fas fa-university"></i>
+                    <span id="camaraNomeNav">Carregando...</span>
+                </div>
+                <a href="portal_publico.html" class="btn btn-outline btn-cta">Voltar ao Portal</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container" style="padding-top: 24px;">
+            <a href="portal_publico.html" class="btn-voltar">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Portal
+            </a>
+        </div>
+
+        <div class="votacao-publica-layout fade-in" id="votacao-layout">
+            <div class="info-column" id="info-column">
+                <!-- Informações da pauta serão carregadas aqui -->
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Carregando votação...</h3>
+                    <p>Aguarde enquanto carregamos as informações da votação.</p>
+                </div>
+            </div>
+
+            <div class="votantes-column" id="votantes-column">
+                <!-- Grid de votantes será carregado aqui -->
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Carregando votos...</h3>
+                    <p>Os votos aparecerão aqui em tempo real.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <p>&copy; 2025 Câmara Municipal. Portal desenvolvido com Legisla Net.</p>
+            <div class="footer-social">
+                <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/global.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Inicializar animações
+            initUnifiedAnimations();
+
+            // Carregar dados da votação
+            await initializeVotacao();
+        });
+
+        // Variáveis globais
+        let pautaId = null;
+
+        // Função para extrair ID da pauta da URL
+        function getPautaIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // Função para inicializar votação pública
+        async function initializeVotacao() {
+            pautaId = getPautaIdFromUrl();
+
+            if (!pautaId) {
+                showError('ID da pauta não encontrado na URL');
+                return;
+            }
+
+            console.log('🔍 Carregando votação pública para pauta:', pautaId);
+
+            try {
+                // Carregar dados da pauta e votos em paralelo
+                const [pautaData, votosData] = await Promise.all([
+                    fetchPautaData(pautaId),
+                    fetchVotosData(pautaId)
+                ]);
+
+                if (pautaData && votosData) {
+                    renderPautaInfo(pautaData);
+                    renderVotosData(votosData);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showError('Erro ao carregar dados da votação');
+            }
+        }
+
+        // Buscar dados da pauta (usando endpoint público)
+        async function fetchPautaData(id) {
+            const response = await fetch(`/api/pautas/${id}/publica`);
+
+            if (!response.ok) {
+                throw new Error(`Erro ao buscar pauta: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        // Buscar dados de votos (usando endpoint público)
+        async function fetchVotosData(id) {
+            const response = await fetch(`/api/votos/pauta/${id}/publico`);
+
+            if (!response.ok) {
+                throw new Error(`Erro ao buscar votos: ${response.status}`);
+            }
+
+            return await response.json();
+        }
+
+        // Renderizar informações da pauta
+        function renderPautaInfo(pauta) {
+            const infoColumn = document.getElementById('info-column');
+
+            // Determinar badges de status e resultado
+            const getStatusBadge = (status) => {
+                if (status === 'Finalizada') {
+                    return '<span class="badge-finalizada">Finalizada</span>';
+                } else if (status === 'Em Votação') {
+                    return '<span class="badge-em-votacao">Em Votação</span>';
+                } else {
+                    return '<span class="badge-pendente">Pendente</span>';
+                }
+            };
+
+            const getResultadoBadge = (status, resultado) => {
+                // Só mostrar resultado se status for "Finalizada"
+                if (status !== 'Finalizada') {
+                    return '';
+                }
+
+                switch (resultado) {
+                    case 'Aprovada':
+                        return '<span class="badge-aprovado">Aprovado</span>';
+                    case 'Reprovada':
+                        return '<span class="badge-reprovado">Reprovado</span>';
+                    case 'Não Votada':
+                        return '<span class="badge-nao-votada">Não Votada</span>';
+                    default:
+                        return '<span class="badge-nao-votada">Não Votada</span>';
+                }
+            };
+
+            // Data de atualização
+            const dataAtualizacao = new Date().toLocaleString('pt-BR');
+
+            // Atualizar título da página
+            document.getElementById('pageTitle').textContent = `${pauta.nome} - Votação Pública`;
+
+            infoColumn.innerHTML = `
+                <div class="info-card">
+                    <h3>${escapeHtml(pauta.nome)}</h3>
+                    <p style="color: var(--secondary-text); font-size: 0.875rem; margin-bottom: 16px;">
+                        Atualizado em ${dataAtualizacao}
+                    </p>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${getStatusBadge(pauta.status)}
+                        ${getResultadoBadge(pauta.status, pauta.resultado_votacao)}
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h3>Descrição da pauta</h3>
+                    <p>${escapeHtml(pauta.descricao || 'Sem descrição disponível')}</p>
+                </div>
+                <div class="info-card">
+                    <h3>Detalhes</h3>
+                    <p><strong>Autor:</strong> ${escapeHtml(pauta.autor || 'Não informado')}</p>
+                    <p><strong>Sessão:</strong> ${escapeHtml(pauta.sessoes?.nome || 'N/A')}</p>
+                    <p><strong>Data:</strong> ${pauta.sessoes?.data_sessao ? new Date(pauta.sessoes.data_sessao).toLocaleDateString('pt-BR') : 'N/A'}</p>
+                </div>
+            `;
+        }
+
+        // Renderizar dados de votos
+        function renderVotosData(votosData) {
+            const { votos, estatisticas } = votosData;
+            const votantesColumn = document.getElementById('votantes-column');
+
+            // Renderizar estatísticas
+            const statsHtml = renderEstatisticas(estatisticas);
+
+            // Renderizar grid de votantes
+            const votantesHtml = renderVotantesGrid(votos);
+
+            votantesColumn.innerHTML = statsHtml + votantesHtml;
+        }
+
+        // Renderizar estatísticas
+        function renderEstatisticas(estatisticas) {
+            if (!estatisticas) {
+                return `
+                    <div class="empty-state">
+                        <i class="fas fa-chart-bar"></i>
+                        <h3>Carregando estatísticas...</h3>
+                        <p>As estatísticas aparecerão aqui em breve.</p>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <div class="stats-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Estatísticas da Votação
+                        </div>
+                        <div class="live-indicator">
+                            <div class="live-dot"></div>
+                            Tempo Real
+                        </div>
+                    </div>
+                    <div class="vote-stats">
+                        <div class="stat-item favor">
+                            <i class="fas fa-thumbs-up stat-icon"></i>
+                            <span class="stat-number">${estatisticas.sim || 0}</span>
+                            <span class="stat-label">A Favor</span>
+                        </div>
+                        <div class="stat-item against">
+                            <i class="fas fa-thumbs-down stat-icon"></i>
+                            <span class="stat-number">${estatisticas.nao || 0}</span>
+                            <span class="stat-label">Contra</span>
+                        </div>
+                        <div class="stat-item abstention">
+                            <i class="fas fa-hand stat-icon"></i>
+                            <span class="stat-number">${estatisticas.abstencao || 0}</span>
+                            <span class="stat-label">Abstenção</span>
+                        </div>
+                    </div>
+                    <div class="total-votes">
+                        <span class="number">${estatisticas.total || 0}</span>
+                        <span class="label">Total de Votos</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderizar grid de votantes
+        function renderVotantesGrid(votos) {
+            if (!votos || votos.length === 0) {
+                return `
+                    <div class="empty-votantes">
+                        <i class="fas fa-vote-yea"></i>
+                        <h3>Nenhum voto registrado</h3>
+                        <p>Os votos aparecerão aqui conforme forem registrados pelos vereadores.</p>
+                    </div>
+                `;
+            }
+
+            const votosHtml = votos.map(voto => {
+                const vereador = voto.vereadores;
+                const partido = vereador.partidos;
+                const timestamp = new Date(voto.created_at).toLocaleString('pt-BR');
+                const votoClass = getVotoClass(voto.voto);
+                const votoIcon = getVotoIcon(voto.voto);
+                const presidenteTag = voto.era_presidente_no_voto ? '<span class="tag tag-presidente">Presidente</span>' : '';
+
+                // Usar foto real do vereador ou fallback
+                const avatarUrl = vereador.foto_url || `https://i.pravatar.cc/50?u=${vereador.id}`;
+
+                // Informações do partido
+                const partidoInfo = partido ? `
+                    <div class="partido-info">
+                        ${partido.logo_url ? `<img src="${partido.logo_url}" alt="${partido.sigla}" class="partido-logo" onerror="this.style.display='none'">` : ''}
+                        <span class="partido-sigla">${escapeHtml(partido.sigla || 'S/P')}</span>
+                    </div>
+                ` : '<div class="partido-info"><span class="partido-sigla">S/P</span></div>';
+
+                return `
+                    <div class="votante-card">
+                        <div class="votante-header">
+                            <div class="votante-info">
+                                <img src="${avatarUrl}" alt="Avatar" class="votante-avatar" onerror="this.src='https://i.pravatar.cc/50?u=${vereador.id}'">
+                                <div class="votante-detalhes">
+                                    <span class="votante-name">${escapeHtml(vereador.nome_parlamentar)}</span>
+                                    ${partidoInfo}
+                                </div>
+                            </div>
+                            ${presidenteTag}
+                        </div>
+                        <div class="voto-display ${votoClass}">${votoIcon} ${voto.voto}</div>
+                        <div class="votante-timestamp">Votou em: ${timestamp}</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `<div class="votantes-grid">${votosHtml}</div>`;
+        }
+
+
+        // Funções auxiliares
+        function getVotoClass(voto) {
+            switch (voto) {
+                case 'SIM': return 'voto-sim';
+                case 'NÃO': return 'voto-nao';
+                case 'ABSTENÇÃO': return 'voto-abstencao';
+                default: return '';
+            }
+        }
+
+        function getVotoIcon(voto) {
+            switch (voto) {
+                case 'SIM': return '<i class="fa-regular fa-circle-check"></i>';
+                case 'NÃO': return '<i class="fa-regular fa-circle-xmark"></i>';
+                case 'ABSTENÇÃO': return '<i class="fa-solid fa-hand"></i>';
+                default: return '';
+            }
+        }
+
+        function escapeHtml(text = "") {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function showError(message) {
+            const votacaoLayout = document.getElementById('votacao-layout');
+            votacaoLayout.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--accent-red);"></i>
+                    <h3>Erro</h3>
+                    <p>${message}</p>
+                    <a href="portal_publico.html" class="btn btn-primary" style="margin-top: 16px; display: inline-block; padding: 8px 16px; text-decoration: none;">
+                        Voltar ao Portal
+                    </a>
+                </div>
+            `;
+        }
+
+    </script>
+</body>
+</html>
