@@ -1,0 +1,75 @@
+/* public/css/pagination.css */
+
+/* --- Container Principal (Mantido como está) --- */
+/* === PAGINATION CONTAINER - SEMPRE NO FINAL === */
+.pagination-container {
+  margin-top: auto; /* EMPURRA PARA O FINAL */
+  padding: 24px 32px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0; /* Não encolhe */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* --- ESTILO DOS BOTÕES ATUALIZADO --- */
+.pagination-controls button,
+.pagination-controls .pagination-ellipsis {
+  /* Estrutura e espaçamento */
+  padding: 8px 7px; /* <-- LARGURA REDUZIDA (padding horizontal diminuído de 14px para 7px) */
+  font-weight: 600;
+  cursor: pointer;
+
+  /* Design */
+  border: none; /* <-- BORDA REMOVIDA */
+  background-color: transparent;
+  color: var(--secondary-text);
+  border-radius: 6px;
+
+  /* Efeitos */
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Efeito HOVER para botões não ativos */
+.pagination-controls button:hover:not(.active) {
+  background-color: var(--hover-bg);
+  color: var(--primary-text);
+}
+
+/* Estilo do botão ATIVO (mantido, mas sem a borda) */
+.pagination-controls button.active {
+  background-color: var(--accent-blue);
+  color: #fff;
+  /* A linha 'border-color' foi removida para garantir que não haja borda */
+}
+
+.pagination-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination-ellipsis {
+  cursor: default;
+  background-color: transparent;
+}
+
+/* --- Ajuste para telas menores (mantido como está) --- */
+@media (max-width: 768px) {
+  .pagination-container {
+    left: 0;
+    width: 100%;
+  }
+
+  .pagination-controls button,
+  .pagination-controls .pagination-ellipsis {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+}
