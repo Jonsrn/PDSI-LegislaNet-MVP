@@ -1,0 +1,26 @@
+<!-- components/portal_navbar.html -->
+<!-- Este componente representa a barra de navegação para o portal público. -->
+<nav class="navbar">
+    <div class="container nav-container">
+        <a href="home.html" class="nav-logo">
+            <svg viewBox="0 0 44 40" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="var(--accent-blue)" />
+                        <stop offset="100%" stop-color="var(--accent-green)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#logoGradient)" d="M 8 5 V 35 H 14 V 5 Z M 19 5 V 35 H 25 V 5 Z M 30 5 V 35 H 36 V 5 Z M 5 35 H 39 V 40 H 5 Z" />
+            </svg>
+            <span>Legisla Net</span>
+        </a>
+        <div class="nav-menu-wrapper">
+            <ul class="nav-menu">
+                <li><a href="portal_publico.html#agenda">Agenda</a></li>
+                <li><a href="portal_publico.html#votes">Votações</a></li>
+                <li><a href="portal_publico.html#members">Vereadores</a></li>
+            </ul>
+            <a href="../app/login.html" class="btn btn-primary">Área do Cliente</a>
+        </div>
+    </div>
+</nav>
