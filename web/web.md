@@ -1,1 +1,0 @@
-Nesse diretório ficará os arquivos do Front-End. (Descrição em construção)

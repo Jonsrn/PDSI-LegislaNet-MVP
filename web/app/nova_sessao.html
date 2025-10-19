@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nova Sessão - Legisla Net</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/forms.css" />
+    <link rel="stylesheet" href="../css/toast.css" />
+    <link rel="stylesheet" href="../css/carregamento.css" />
+
+    <script src="../js/toast.js"></script>
+    <script src="../js/global.js"></script>
+    <script src="../js/carregamento.js"></script>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="sidebar-placeholder"></div>
+      <main class="main-content" id="mainContent">
+        <div id="header-placeholder"></div>
+
+        <section class="form-section fade-in">
+          <form id="sessao-form">
+            <h2>Cadastrar Nova Sessão</h2>
+
+            <div class="form-group" style="margin-top: 24px">
+              <label for="tipo-sessao">Tipo de Sessão</label>
+              <select id="tipo-sessao" class="form-select" required>
+                <option value="" disabled selected>Selecione um tipo...</option>
+                <option value="Ordinária">Ordinária</option>
+                <option value="Extraordinária">Extraordinária</option>
+                <option value="Solene">Solene</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="numero-sessao">Número da Sessão</label>
+              <input
+                type="number"
+                id="numero-sessao"
+                class="form-input"
+                placeholder="Ex: 12"
+                required
+                min="1"
+              />
+              <small class="form-text"
+                >O nome completo será gerado automaticamente. Ex: "12ª Sessão
+                Ordinária de 2025".</small
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="data-sessao">Data da Sessão</label>
+              <input
+                type="datetime-local"
+                id="data-sessao"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="status-sessao">Status</label>
+              <select id="status-sessao" class="form-select" required>
+                <option value="Agendada" selected>Agendada</option>
+                <option value="Em Andamento">Em Andamento</option>
+                <option value="Finalizada">Finalizada</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="cancel-btn">
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary" id="submit-btn">
+                Salvar Sessão
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        try {
+          protectPage();
+        } catch (e) {
+          console.error(e.message);
+          return;
+        }
+
+        initLayout({
+          title: "Nova Sessão",
+          icon: "fa-calendar-plus",
+          navActive: "nav-sessoes",
+        });
+
+        const formSection = document.querySelector(".form-section");
+        const form = document.getElementById("sessao-form");
+
+        // Configura data mínima para hoje
+        const dataSessaoInput = document.getElementById("data-sessao");
+        dataSessaoInput.min = new Date().toISOString().split("T")[0];
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const authToken = localStorage.getItem("authToken");
+
+          try {
+            const formData = {
+              numero: document.getElementById("numero-sessao").value,
+              tipo: document.getElementById("tipo-sessao").value,
+              data_sessao: dataSessaoInput.value,
+              status: document.getElementById("status-sessao").value,
+            };
+
+            if (!formData.numero || !formData.tipo || !formData.data_sessao) {
+              throw new Error(
+                "Por favor, preencha todos os campos obrigatórios."
+              );
+            }
+
+            const response = await fetch("/api/sessoes", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authToken}`,
+              },
+              body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              const errorMsg =
+                result.details ||
+                result.error ||
+                "Ocorreu um erro desconhecido.";
+              // Se 'details' for um array (do express-validator), pega a primeira mensagem
+              const finalMsg = Array.isArray(errorMsg)
+                ? errorMsg[0].message
+                : errorMsg;
+              throw new Error(finalMsg);
+            }
+
+            showToast(
+              `Sessão "${result.data.nome}" criada com sucesso!`,
+              "success"
+            );
+            form.reset();
+            dataSessaoInput.min = new Date().toISOString().split("T")[0];
+          } catch (error) {
+            console.error("Erro ao criar sessão:", error);
+            showToast(error.message, "error");
+          } finally {
+          }
+        });
+
+        document.getElementById("cancel-btn").addEventListener("click", () => {
+          if (confirm("Deseja cancelar? Os dados não salvos serão perdidos.")) {
+            window.location.href = "/app/dashboard.html";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

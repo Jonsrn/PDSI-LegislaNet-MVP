@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Votos - Legisla Net</title>
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <link rel="stylesheet" href="../css/global.css">
+
+    <style>
+        /* ESTILOS ESPECÍFICOS DA PÁGINA DE RELATÓRIO */
+        .sidebar-header .logo-svg {
+            height: 32px;
+            width: auto;
+            flex-shrink: 0;
+        }
+        .relatorio-section { 
+            background-color: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            padding: 24px; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .relatorio-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 24px; 
+            flex-wrap: wrap; 
+            gap: 16px; 
+        }
+        .relatorio-header h2 { 
+            font-size: 1.25rem; 
+        }
+        
+        /* Botões de Exportação */
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-export {
+            background-color: #ffffff;
+            border: 2px solid;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s ease, background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-export:hover { 
+            transform: translateY(-2px); 
+            background-color: #f0f0f0; 
+        }
+        .btn-export:active { 
+            transform: scale(0.98); 
+        }
+        
+        .btn-export-pdf { 
+            border-color: var(--pdf-red); 
+            color: var(--pdf-red); 
+        }
+        .btn-export-excel { 
+            border-color: var(--excel-green); 
+            color: var(--excel-green); 
+        }
+
+        .btn-export .text-black { 
+            color: #000000; 
+        }
+        .btn-export-pdf .text-format { 
+            color: var(--pdf-red); 
+        }
+        .btn-export-excel .text-format { 
+            color: var(--excel-green); 
+        }
+
+        /* Tabela de Relatórios */
+        .table-container { 
+            flex-grow: 1; 
+            overflow-x: auto; 
+        }
+        .relatorio-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 0.875rem; 
+        }
+        .relatorio-table th, .relatorio-table td { 
+            padding: 12px 16px; 
+            text-align: left; 
+            vertical-align: top; 
+            white-space: normal; 
+        }
+        .relatorio-table tbody tr { 
+            border-bottom: 1px solid var(--border-color); 
+            transition: background-color 0.2s; 
+        }
+        .relatorio-table tbody tr:hover { 
+            background-color: var(--hover-bg); 
+        }
+        .relatorio-table th { 
+            color: var(--secondary-text); 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            font-size: 0.75rem; 
+            white-space: nowrap; 
+        }
+        
+        .votos-info { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+        }
+        .votos-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-weight: 600; 
+        }
+        .votos-sim .votos-header { 
+            color: var(--accent-green); 
+        }
+        .votos-nao .votos-header { 
+            color: var(--accent-red); 
+        }
+        .votos-abstencao .votos-header { 
+            color: var(--accent-orange); 
+        }
+        .votos-list { 
+            font-size: 0.8rem; 
+            color: var(--secondary-text); 
+            line-height: 1.4; 
+        }
+
+
+        /* RESPONSIVIDADE */
+        .cards-container { 
+            display: none; 
+        }
+        @media (max-width: 992px) {
+            .table-container { display: none; }
+            .cards-container { 
+                display: grid; 
+                grid-template-columns: 1fr; 
+                gap: 16px; 
+                flex-grow: 1; 
+            }
+            .relatorio-card { 
+                background-color: var(--hover-bg); 
+                border: 1px solid var(--border-color); 
+                border-radius: 8px; 
+                padding: 16px; 
+                display: flex; 
+                flex-direction: column; 
+                gap: 12px; 
+            }
+            .relatorio-card-header h3 { 
+                font-size: 1rem; 
+                font-weight: 600; 
+            }
+            .relatorio-card-body { 
+                font-size: 0.875rem; 
+                color: var(--secondary-text); 
+                display: flex; 
+                flex-direction: column; 
+                gap: 8px; 
+            }
+            .relatorio-card-body .info-row { 
+                display: flex; 
+                justify-content: space-between; 
+            }
+            .relatorio-card-footer { 
+                border-top: 1px solid var(--border-color); 
+                padding-top: 12px; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+        
+        <div id="sidebar-placeholder"></div>
+
+        <main class="main-content" id="mainContent">
+            
+            <div id="header-placeholder"></div>
+
+            <section class="relatorio-section fade-in">
+                <div class="relatorio-header">
+                    <h2>Relatório de Votos</h2>
+                    <div class="export-buttons">
+                        <button class="btn-export btn-export-pdf">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span class="text-black">Exportar</span>
+                            <span class="text-format">PDF</span>
+                        </button>
+                        <button class="btn-export btn-export-excel">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span class="text-black">Exportar</span>
+                            <span class="text-format">Excel</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="relatorio-table">
+                        <thead>
+                            <tr>
+                                <th>Pauta</th>
+                                <th>Autor</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                                <th>Sim</th>
+                                <th>Não</th>
+                                <th>Abstenção</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Denúncia - 2ª votação</td>
+                                <td>Ver. Toinho de Quinca</td>
+                                <td><span class="status-badge">Finalizada</span></td>
+                                <td>29/07/2025</td>
+                                <td class="votos-sim">
+                                    <div class="votos-info">
+                                        <div class="votos-header"><i class="fa-regular fa-circle-check"></i> Sim (8)</div>
+                                        <div class="votos-list">SAMIM, JOÃO LOURENDE, RAMON BELO, DE ASSIS DANTAS, TOINHO DE QUINCA, VALDIVIA MOURA</div>
+                                    </div>
+                                </td>
+                                <td class="votos-nao">
+                                    <div class="votos-info">
+                                        <div class="votos-header"><i class="fa-regular fa-circle-xmark"></i> Não (0)</div>
+                                    </div>
+                                </td>
+                                <td class="votos-abstencao">
+                                    <div class="votos-info">
+                                        <div class="votos-header"><i class="fa-regular fa-circle"></i> Abstenção (0)</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="cards-container">
+                    <div class="relatorio-card">
+                        <div class="relatorio-card-header"><h3>Denúncia - 2ª votação</h3></div>
+                        <div class="relatorio-card-body">
+                            <div class="info-row"><span class="label">Autor:</span> <span>Ver. Toinho de Quinca</span></div>
+                            <div class="info-row"><span class="label">Data:</span> <span>29/07/2025</span></div>
+                            <div class="info-row"><span class="label">Status:</span> <span><span class="status-badge">Finalizada</span></span></div>
+                        </div>
+                        <div class="relatorio-card-footer">
+                            <div class="votos-info votos-sim">
+                                <div class="votos-header"><i class="fa-regular fa-circle-check"></i> Sim (8)</div>
+                                <div class="votos-list">SAMIM, JOÃO LOURENDE, RAMON BELO...</div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <script src="../js/global.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initLayout({
+                title: 'Relatório de Votações',
+                icon: 'fa-chart-pie',
+                navActive: 'nav-relatorio'
+            });
+        });        
+    </script>
+</body>
+</html>

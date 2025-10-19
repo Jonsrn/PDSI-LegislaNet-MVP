@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel de Controle - Legisla Net</title>
+
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/modals.css" />
+    <link rel="stylesheet" href="../css/forms.css" />
+    <link rel="stylesheet" href="../css/toast.css" />
+    <link rel="stylesheet" href="../css/carregamento.css" />
+
+    <style>
+      /* ESTILOS ESPECÍFICOS DO PAINEL DE CONTROLE */
+      .painel-section {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 24px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 600px;
+        height: calc(100vh - 140px);
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .section-header h2 {
+        font-size: 1.25rem;
+      }
+
+      /* Toggle de Alternância */
+      .toggle-container {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+
+      .toggle-btn {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--secondary-text);
+        padding: 12px 32px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .toggle-btn:hover {
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+      }
+
+      .toggle-btn.active {
+        background-color: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+      }
+
+      /* Seções de Conteúdo */
+      .pautas-list,
+      .oradores-list {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .pautas-list.hidden,
+      .oradores-list.hidden {
+        display: none;
+      }
+
+      .list-header,
+      .list-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+      }
+
+      .list-header {
+        color: var(--secondary-text);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .list-item {
+        font-size: 0.875rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s;
+      }
+
+      .list-item:hover {
+        background-color: var(--hover-bg);
+      }
+
+      /* Colunas - Pautas */
+      .col-pauta-nome {
+        flex: 3;
+      }
+      .col-pauta-sessao {
+        flex: 2;
+      }
+      .col-pauta-status {
+        flex: 1.5;
+        text-align: center;
+      }
+      .col-pauta-acoes {
+        flex: 1.5;
+        text-align: right;
+      }
+
+      /* Colunas - Oradores */
+      .col-ordem {
+        flex: 0.5;
+        text-align: center;
+      }
+      .col-vereador {
+        flex: 3;
+      }
+      .col-sessao {
+        flex: 2.5;
+      }
+      .col-tempo {
+        flex: 1.5;
+        text-align: center;
+      }
+      .col-acoes {
+        flex: 1.5;
+        text-align: right;
+      }
+
+      /* Badge de Status */
+      .status-votacao {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 99px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        background-color: rgba(88, 166, 255, 0.2);
+        color: var(--accent-blue);
+        border: 1px solid rgba(88, 166, 255, 0.5);
+      }
+
+      /* Botões de ação */
+      .actions-cell {
+        display: flex;
+        gap: 0;
+        justify-content: flex-end;
+      }
+
+      .actions-cell .btn-action {
+        color: white;
+        padding: 6px 14px;
+        margin-left: 8px;
+        text-decoration: none;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .btn-iniciar {
+        background-color: var(--accent-green);
+        min-width: 160px;
+        justify-content: center;
+      }
+
+      .btn-iniciar:hover {
+        background-color: #249e48;
+        transform: translateY(-1px);
+      }
+
+      .btn-iniciar-fala {
+        background-color: var(--accent-orange);
+        min-width: 160px;
+        justify-content: center;
+      }
+
+      .btn-iniciar-fala:hover {
+        background-color: #e07c00;
+        transform: translateY(-1px);
+      }
+
+      .btn-encerrar {
+        background-color: var(--accent-red);
+        min-width: 160px;
+        justify-content: center;
+      }
+
+      .btn-encerrar:hover {
+        background-color: #c62828;
+        transform: translateY(-1px);
+      }
+
+      /* Estado vazio */
+      .no-data {
+        border: none !important;
+      }
+
+      .no-data:hover {
+        background: transparent !important;
+      }
+
+      /* Customizações específicas para vereadores */
+      .vereador-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: 12px;
+      }
+
+      .vereador-foto {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--border-color);
+        flex-shrink: 0;
+      }
+
+      .vereador-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .vereador-nome {
+        font-weight: 500;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .vereador-separador {
+        color: var(--secondary-text);
+        font-weight: normal;
+      }
+
+      .vereador-partido-container {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+
+      .vereador-partido {
+        font-size: 0.85rem;
+        color: var(--secondary-text);
+        font-weight: 500;
+      }
+
+      .partido-logo {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid var(--border-color);
+      }
+
+      /* RESPONSIVIDADE */
+      .cards-container {
+        display: none;
+        visibility: hidden;
+      }
+
+      @media (max-width: 768px) {
+        .pautas-list,
+        .oradores-list {
+          display: none;
+          visibility: hidden;
+        }
+
+        .cards-container {
+          display: grid;
+          visibility: visible;
+          grid-template-columns: 1fr;
+          gap: 12px;
+          flex-grow: 1;
+        }
+
+        .pauta-card,
+        .orador-card {
+          background-color: var(--hover-bg);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .pauta-card-header,
+        .orador-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .pauta-card-header h3,
+        .orador-card-header h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          margin: 0;
+          flex: 1;
+        }
+
+        .pauta-card-body,
+        .orador-card-body {
+          font-size: 0.875rem;
+          color: var(--secondary-text);
+        }
+
+        .pauta-card .actions-cell .btn-action,
+        .orador-card .actions-cell .btn-action {
+          padding: 4px 8px;
+          font-size: 0.7rem;
+          margin-left: 4px;
+        }
+
+        .toggle-container {
+          flex-direction: column;
+        }
+
+        .toggle-btn {
+          width: 100%;
+        }
+      }
+
+      /* Estados vazios e de erro */
+      .empty-state {
+        text-align: center;
+        padding: 64px 24px;
+        color: var(--secondary-text);
+      }
+
+      .empty-state i {
+        font-size: 2rem;
+        margin-bottom: 16px;
+        display: block;
+        opacity: 0.6;
+      }
+
+      .empty-state p {
+        margin: 0;
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <div id="sidebar-placeholder"></div>
+
+      <main class="main-content" id="mainContent">
+        <div id="header-placeholder"></div>
+
+        <section class="painel-section fade-in">
+          <div class="section-header">
+            <h2>Painel de Controle</h2>
+          </div>
+
+          <!-- Toggle de Alternância -->
+          <div class="toggle-container">
+            <button class="toggle-btn active" id="btn-pautas">
+              <i class="fas fa-vote-yea"></i>
+              Pautas em Votação
+            </button>
+            <button class="toggle-btn" id="btn-oradores">
+              <i class="fas fa-microphone"></i>
+              Oradores
+            </button>
+          </div>
+
+          <!-- Conteúdo de Pautas -->
+          <div class="pautas-list" id="pautas-section">
+            <div class="list-header">
+              <div class="col-pauta-nome">Pauta</div>
+              <div class="col-pauta-sessao">Sessão</div>
+              <div class="col-pauta-status">Status</div>
+              <div class="col-pauta-acoes">Ações</div>
+            </div>
+            <div id="pautas-list-content">
+              <!-- Pautas serão carregadas dinamicamente -->
+            </div>
+          </div>
+
+          <div class="cards-container" id="pautas-cards-content">
+            <!-- Cards serão carregados dinamicamente -->
+          </div>
+
+          <!-- Conteúdo de Oradores -->
+          <div class="oradores-list hidden" id="oradores-section">
+            <div class="list-header">
+              <div class="col-ordem">#</div>
+              <div class="col-vereador">Vereador</div>
+              <div class="col-sessao">Sessão</div>
+              <div class="col-tempo">Tempo</div>
+              <div class="col-acoes">Ações</div>
+            </div>
+            <div id="oradores-list-content">
+              <!-- Oradores serão carregados dinamicamente -->
+            </div>
+          </div>
+
+          <div class="cards-container hidden" id="oradores-cards-content">
+            <!-- Cards serão carregados dinamicamente -->
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="../js/global.js"></script>
+    <script src="../js/modals.js"></script>
+    <script src="../js/toast.js"></script>
+    <script src="../js/carregamento.js"></script>
+
+    <script>
+      // Variável para controlar a seção atual
+      let currentView = "pautas"; // 'pautas' ou 'oradores'
+
+      // Toggle entre Pautas e Oradores
+      document
+        .getElementById("btn-pautas")
+        .addEventListener("click", function () {
+          if (currentView === "pautas") return;
+
+          currentView = "pautas";
+
+          // Atualizar botões
+          this.classList.add("active");
+          document.getElementById("btn-oradores").classList.remove("active");
+
+          // Mostrar/ocultar seções
+          document.getElementById("pautas-section").classList.remove("hidden");
+          document.getElementById("oradores-section").classList.add("hidden");
+
+          // Carregar pautas
+          loadPautasEmVotacao();
+        });
+
+      document
+        .getElementById("btn-oradores")
+        .addEventListener("click", function () {
+          if (currentView === "oradores") return;
+
+          currentView = "oradores";
+
+          // Atualizar botões
+          this.classList.add("active");
+          document.getElementById("btn-pautas").classList.remove("active");
+
+          // Mostrar/ocultar seções
+          document.getElementById("pautas-section").classList.add("hidden");
+          document
+            .getElementById("oradores-section")
+            .classList.remove("hidden");
+
+          // Carregar oradores
+          loadOradoresAtivos();
+        });
+
+      // Carregar pautas em votação
+      async function loadPautasEmVotacao() {
+        const listContent = document.getElementById("pautas-list-content");
+        const cardsContent = document.getElementById("pautas-cards-content");
+
+        renderLoadingState(listContent, "Carregando pautas em votação...");
+        cardsContent.innerHTML = "";
+
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(
+            "/api/painel-controle/pautas-em-votacao",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Erro ao carregar pautas");
+          }
+
+          const responseData = await response.json();
+          const pautas = responseData.data || [];
+
+          if (pautas.length === 0) {
+            renderEmptyState(
+              listContent,
+              "Nenhuma pauta em votação no momento",
+              "fa-solid fa-vote-yea"
+            );
+            cardsContent.innerHTML = "";
+            return;
+          }
+
+          // Verificar votações ativas usando camaraId da primeira pauta
+          if (pautas[0]?.sessoes?.camara_id) {
+            await checkVotacoesAtivas(pautas[0].sessoes.camara_id);
+          }
+
+          // Limpar conteúdos anteriores
+          listContent.innerHTML = "";
+          cardsContent.innerHTML = "";
+
+          let html = "";
+          let cardsHtml = "";
+
+          pautas.forEach((pauta) => {
+            const dataSessao = new Date(pauta.sessoes.data_sessao);
+            const dataFormatada = dataSessao.toLocaleDateString("pt-BR");
+
+            // Verificar se a pauta foi iniciada pelo painel de controle
+            const pautaIniciada = pautasIniciadas.has(pauta.id);
+            console.log(
+              `🔎 [PAINEL] Renderizando pauta ${pauta.id}: iniciada=${pautaIniciada}, Set contém:`,
+              Array.from(pautasIniciadas)
+            );
+
+            const btnClass = pautaIniciada ? "btn-encerrar" : "btn-iniciar";
+            const btnIcon = pautaIniciada ? "fa-stop" : "fa-play";
+            const btnText = pautaIniciada
+              ? "Encerrar Votação"
+              : "Iniciar Votação";
+            const btnTextMobile = pautaIniciada ? "Encerrar" : "Iniciar";
+
+            // Lista (desktop)
+            html += `
+                        <div class="list-item" data-pauta-id="${pauta.id}">
+                            <div class="col-pauta-nome">
+                                <div>
+                                    <div style="font-weight: 500;">${
+                                      pauta.nome
+                                    }</div>
+                                    ${
+                                      pauta.descricao
+                                        ? `<div style="color: var(--secondary-text); font-size: 0.8rem;">${pauta.descricao.substring(
+                                            0,
+                                            60
+                                          )}${
+                                            pauta.descricao.length > 60
+                                              ? "..."
+                                              : ""
+                                          }</div>`
+                                        : ""
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-pauta-sessao">
+                                <div>
+                                    <div style="font-weight: 500;">${
+                                      pauta.sessoes.nome
+                                    }</div>
+                                    <div style="color: var(--secondary-text); font-size: 0.8rem;">${dataFormatada}</div>
+                                </div>
+                            </div>
+                            <div class="col-pauta-status">
+                                <span class="status-votacao">Em Votação</span>
+                            </div>
+                            <div class="col-pauta-acoes">
+                                <div class="actions-cell">
+                                    <button class="btn btn-action ${btnClass}" data-pauta-id="${
+              pauta.id
+            }" data-pauta-nome="${pauta.nome}">
+                                        <i class="fas ${btnIcon}"></i> ${btnText}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+            // Cards (mobile)
+            cardsHtml += `
+                        <div class="pauta-card" data-pauta-id="${pauta.id}">
+                            <div class="pauta-card-header">
+                                <h3>${pauta.nome}</h3>
+                                <span class="status-votacao">Em Votação</span>
+                            </div>
+                            <div class="pauta-card-body">
+                                ${
+                                  pauta.descricao
+                                    ? `<div style="margin-bottom: 8px;">${pauta.descricao}</div>`
+                                    : ""
+                                }
+                                <div>
+                                    <div style="font-weight: 500;">${
+                                      pauta.sessoes.nome
+                                    }</div>
+                                    <div style="color: var(--secondary-text); font-size: 0.8rem;">${dataFormatada}</div>
+                                </div>
+                            </div>
+                            <div class="actions-cell">
+                                <button class="btn btn-action ${btnClass}" data-pauta-id="${
+              pauta.id
+            }" data-pauta-nome="${pauta.nome}">
+                                    <i class="fas ${btnIcon}"></i> ${btnTextMobile}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+          });
+
+          listContent.innerHTML = html;
+          cardsContent.innerHTML = cardsHtml;
+        } catch (error) {
+          console.error("Erro ao carregar pautas:", error);
+          renderErrorState(listContent, "Erro ao carregar pautas em votação");
+          cardsContent.innerHTML = "";
+          showToast("Erro ao carregar pautas em votação", "error");
+        }
+      }
+
+      // Carregar oradores ativos
+      async function loadOradoresAtivos() {
+        console.log("🔍 [ORADORES] Iniciando carregamento de oradores...");
+        const listContent = document.getElementById("oradores-list-content");
+        const cardsContent = document.getElementById("oradores-cards-content");
+
+        console.log("🔍 [ORADORES] Elementos DOM encontrados:", {
+          listContent: !!listContent,
+          cardsContent: !!cardsContent,
+        });
+
+        renderLoadingState(listContent, "Carregando oradores...");
+        cardsContent.innerHTML = "";
+
+        try {
+          const token = localStorage.getItem("authToken");
+          console.log(
+            "🔍 [ORADORES] Token obtido:",
+            token ? "Sim (presente)" : "Não (ausente)"
+          );
+
+          console.log(
+            "🔍 [ORADORES] Fazendo requisição para /api/painel-controle/oradores..."
+          );
+          const response = await fetch("/api/painel-controle/oradores", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          console.log("🔍 [ORADORES] Resposta recebida:", {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok,
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("❌ [ORADORES] Erro na resposta:", errorText);
+            throw new Error(`Erro ao carregar oradores: ${response.status}`);
+          }
+
+          const responseData = await response.json();
+          console.log("🔍 [ORADORES] Dados recebidos:", {
+            total: responseData.total,
+            quantidade: responseData.data?.length,
+            dados: responseData.data,
+          });
+
+          const oradores = responseData.data || [];
+
+          if (oradores.length === 0) {
+            renderEmptyState(
+              listContent,
+              "Nenhum orador cadastrado no momento",
+              "fa-solid fa-microphone"
+            );
+            cardsContent.innerHTML = "";
+            return;
+          }
+
+          // Limpar conteúdos anteriores
+          listContent.innerHTML = "";
+          cardsContent.innerHTML = "";
+
+          // Agrupar por sessão e ordenar
+          const oradoresPorSessao = oradores.reduce((acc, orador) => {
+            const sessaoId = orador.sessoes?.id;
+            if (!acc[sessaoId]) {
+              acc[sessaoId] = {
+                sessao: orador.sessoes,
+                oradores: [],
+              };
+            }
+            acc[sessaoId].oradores.push(orador);
+            return acc;
+          }, {});
+
+          let html = "";
+          let cardsHtml = "";
+
+          // Ordenar grupos por data da sessão (mais recente primeiro)
+          const gruposOrdenados = Object.values(oradoresPorSessao).sort(
+            (a, b) => {
+              return (
+                new Date(b.sessao.data_sessao) - new Date(a.sessao.data_sessao)
+              );
+            }
+          );
+
+          gruposOrdenados.forEach((grupo) => {
+            // Ordenar oradores por ordem
+            grupo.oradores.sort((a, b) => a.ordem - b.ordem);
+
+            grupo.oradores.forEach((orador) => {
+              const dataSessao = new Date(grupo.sessao.data_sessao);
+              const dataFormatada = dataSessao.toLocaleDateString("pt-BR");
+              const tempoTexto = orador.tempo_fala_minutos
+                ? `${orador.tempo_fala_minutos} min`
+                : "Não definido";
+              const partidoSigla = orador.vereadores?.partidos?.sigla || "S/P";
+
+              // Lista (desktop)
+              html += `
+                            <div class="list-item" data-orador-id="${
+                              orador.id
+                            }">
+                                <div class="col-ordem">${orador.ordem}º</div>
+                                <div class="col-vereador">
+                                    <div class="vereador-container">
+                                        ${
+                                          orador.vereadores?.foto_url
+                                            ? `<img src="${orador.vereadores.foto_url}" alt="${orador.vereadores.nome_parlamentar}" class="vereador-foto" onerror="this.style.display='none'">`
+                                            : '<div class="vereador-foto" style="background: var(--border-color); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="color: var(--secondary-text); font-size: 16px;"></i></div>'
+                                        }
+                                        <div class="vereador-info">
+                                            <span class="vereador-nome">${
+                                              orador.vereadores
+                                                ?.nome_parlamentar
+                                            }</span>
+                                            ${
+                                              partidoSigla !== "S/P"
+                                                ? `<span class="vereador-separador">-</span>`
+                                                : ""
+                                            }
+                                            <div class="vereador-partido-container">
+                                                <span class="vereador-partido">${partidoSigla}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sessao">
+                                    <div>
+                                        <div style="font-weight: 500;">${
+                                          grupo.sessao.nome
+                                        }</div>
+                                        <div style="color: var(--secondary-text); font-size: 0.8rem;">${dataFormatada}</div>
+                                    </div>
+                                </div>
+                                <div class="col-tempo">${tempoTexto}</div>
+                                <div class="col-acoes">
+                                    <div class="actions-cell">
+                                        <button class="btn btn-action btn-iniciar-fala" data-orador-id="${
+                                          orador.id
+                                        }" data-orador-nome="${
+                orador.vereadores?.nome_parlamentar
+              }">
+                                            <i class="fas fa-microphone"></i> Iniciar Fala
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+              // Cards (mobile)
+              cardsHtml += `
+                            <div class="orador-card" data-orador-id="${orador.id}">
+                                <div class="orador-card-header">
+                                    <h3>${orador.vereadores?.nome_parlamentar} (${partidoSigla})</h3>
+                                </div>
+                                <div class="orador-card-body">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <span><strong>Ordem:</strong> ${orador.ordem}º</span>
+                                        <span><strong>Tempo:</strong> ${tempoTexto}</span>
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 500;">${grupo.sessao.nome}</div>
+                                        <div style="color: var(--secondary-text); font-size: 0.8rem;">${dataFormatada}</div>
+                                    </div>
+                                </div>
+                                <div class="actions-cell">
+                                    <button class="btn btn-action btn-iniciar-fala" data-orador-id="${orador.id}" data-orador-nome="${orador.vereadores?.nome_parlamentar}">
+                                        <i class="fas fa-microphone"></i> Iniciar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+            });
+          });
+
+          listContent.innerHTML = html;
+          cardsContent.innerHTML = cardsHtml;
+        } catch (error) {
+          console.error("Erro ao carregar oradores:", error);
+          renderErrorState(listContent, "Erro ao carregar oradores");
+          cardsContent.innerHTML = "";
+          showToast("Erro ao carregar oradores", "error");
+        }
+      }
+
+      // Sistema de tracking de pautas iniciadas pelo painel de controle
+      const pautasIniciadas = new Set();
+
+      // Verificar votações ativas ao carregar
+      async function checkVotacoesAtivas(camaraId) {
+        try {
+          if (!camaraId) {
+            console.warn("⚠️ [PAINEL] camaraId não fornecido");
+            return;
+          }
+
+          console.log(`🔍 [PAINEL] Buscando status para câmara ${camaraId}`);
+          const response = await fetch(
+            `/api/votacao-ao-vivo/status/${camaraId}`
+          );
+
+          console.log(`📡 [PAINEL] Response status: ${response.status}`);
+
+          if (!response.ok) {
+            console.warn("⚠️ [PAINEL] API retornou erro");
+            return;
+          }
+
+          const data = await response.json();
+          console.log("📊 [PAINEL] Dados recebidos:", data);
+
+          if (data.isLive && data.votacoes && data.votacoes.length > 0) {
+            console.log(
+              `✅ [PAINEL] ${data.votacoes.length} votação(ões) ativa(s) encontrada(s)`
+            );
+
+            // Marcar pautas ativas no Set
+            data.votacoes.forEach((votacao) => {
+              if (votacao.pautaId) {
+                pautasIniciadas.add(votacao.pautaId);
+                console.log(
+                  `✅ [PAINEL] Pauta ${votacao.pautaId} marcada como ativa`
+                );
+              }
+            });
+
+            console.log(
+              "📋 [PAINEL] pautasIniciadas após carregar:",
+              Array.from(pautasIniciadas)
+            );
+          } else {
+            console.log("📴 [PAINEL] Nenhuma votação ativa no momento");
+          }
+        } catch (error) {
+          console.error(
+            "❌ [PAINEL] Erro ao verificar votações ativas:",
+            error
+          );
+        }
+      }
+
+      // Iniciar votação
+      async function iniciarVotacao(pautaId, pautaNome) {
+        // Verificar se já existe uma votação ativa
+        if (pautasIniciadas.size > 0) {
+          const pautaAtivaId = Array.from(pautasIniciadas)[0];
+
+          // Buscar nome da pauta ativa
+          const listItems = document.querySelectorAll(".list-item, .card");
+          let nomePautaAtiva = "outra pauta";
+
+          listItems.forEach((item) => {
+            if (item.dataset.pautaId === pautaAtivaId) {
+              const titleElement = item.querySelector(
+                ".col-pauta-nome div, .card-title"
+              );
+              if (titleElement) {
+                nomePautaAtiva = titleElement.textContent.trim();
+              }
+            }
+          });
+
+          showToast(
+            `Já há votação em andamento: "${nomePautaAtiva}"`,
+            "warning"
+          );
+          return;
+        }
+
+        const confirmou = await showConfirmModal(
+          `Todos os vereadores serão notificados para votar na pauta "${pautaNome}".`,
+          "Iniciar Votação?"
+        );
+
+        if (!confirmou) {
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(
+            `/api/painel-controle/iniciar-votacao/${pautaId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Erro ao iniciar votação");
+          }
+
+          const result = await response.json();
+          showToast(
+            result.message || "Votação iniciada com sucesso!",
+            "success"
+          );
+
+          // Marcar pauta como iniciada
+          pautasIniciadas.add(pautaId);
+
+          // Recarregar lista de pautas
+          loadPautasEmVotacao();
+        } catch (error) {
+          console.error("Erro ao iniciar votação:", error);
+          showToast(error.message || "Erro ao iniciar votação", "error");
+        }
+      }
+
+      // Encerrar votação
+      async function encerrarVotacao(pautaId, pautaNome) {
+        const confirmou = await showConfirmModal(
+          `O resultado será calculado automaticamente com base nos votos registrados.`,
+          `Encerrar "${pautaNome}"?`
+        );
+
+        if (!confirmou) {
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("authToken");
+
+          // Reutilizar a rota existente de atualização de status
+          const response = await fetch(`/api/pautas/${pautaId}/status`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              status: "Finalizada",
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Erro ao encerrar votação");
+          }
+
+          const result = await response.json();
+          const resultado = result.data?.resultado_votacao || "Calculado";
+          showToast(`Votação encerrada! Resultado: ${resultado}`, "success");
+
+          // Notificar tablets para voltar ao dashboard
+          const camaraId = result.data?.sessoes?.camara_id;
+          if (camaraId) {
+            try {
+              await fetch("http://localhost:3003/api/notify/encerrar-votacao", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  camaraId: camaraId,
+                  pautaId: pautaId,
+                  pautaNome: pautaNome,
+                  resultado: resultado,
+                }),
+              });
+              console.log(
+                "✅ Tablets notificados sobre encerramento da votação"
+              );
+            } catch (notifyError) {
+              console.error("⚠️ Erro ao notificar tablets:", notifyError);
+              // Não bloquear o fluxo se a notificação falhar
+            }
+          }
+
+          // Remover da lista de pautas iniciadas
+          pautasIniciadas.delete(pautaId);
+
+          // Recarregar lista de pautas
+          loadPautasEmVotacao();
+        } catch (error) {
+          console.error("Erro ao encerrar votação:", error);
+          showToast(error.message || "Erro ao encerrar votação", "error");
+        }
+      }
+
+      // Iniciar fala
+      async function iniciarFala(oradorId, oradorNome) {
+        if (
+          !confirm(
+            `Deseja iniciar a fala de "${oradorNome}"?\n\nTodos os vereadores serão notificados.`
+          )
+        ) {
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem("authToken");
+          const response = await fetch(
+            `/api/painel-controle/iniciar-fala/${oradorId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Erro ao iniciar fala");
+          }
+
+          const result = await response.json();
+          showToast(result.message || "Fala iniciada com sucesso!", "success");
+
+          // Recarregar lista de oradores
+          loadOradoresAtivos();
+        } catch (error) {
+          console.error("Erro ao iniciar fala:", error);
+          showToast(error.message || "Erro ao iniciar fala", "error");
+        }
+      }
+
+      // Inicialização
+      document.addEventListener("DOMContentLoaded", () => {
+        initLayout({
+          title: "Painel de Controle",
+          icon: "fa-sliders-h",
+          navActive: "nav-painel-controle",
+        });
+
+        // Event delegation para botões
+        document.addEventListener("click", (e) => {
+          const btnIniciar = e.target.closest(".btn-iniciar");
+          if (btnIniciar) {
+            const pautaId = btnIniciar.dataset.pautaId;
+            const pautaNome = btnIniciar.dataset.pautaNome;
+            if (pautaId && pautaNome) {
+              iniciarVotacao(pautaId, pautaNome);
+            }
+          }
+
+          const btnEncerrar = e.target.closest(".btn-encerrar");
+          if (btnEncerrar) {
+            const pautaId = btnEncerrar.dataset.pautaId;
+            const pautaNome = btnEncerrar.dataset.pautaNome;
+            if (pautaId && pautaNome) {
+              encerrarVotacao(pautaId, pautaNome);
+            }
+          }
+
+          const btnIniciarFala = e.target.closest(".btn-iniciar-fala");
+          if (btnIniciarFala) {
+            const oradorId = btnIniciarFala.dataset.oradorId;
+            const oradorNome = btnIniciarFala.dataset.oradorNome;
+            if (oradorId && oradorNome) {
+              iniciarFala(oradorId, oradorNome);
+            }
+          }
+        });
+
+        // Carregar pautas em votação (view inicial)
+        loadPautasEmVotacao();
+      });
+    </script>
+  </body>
+</html>
