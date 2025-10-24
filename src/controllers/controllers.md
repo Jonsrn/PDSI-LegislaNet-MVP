@@ -1,1 +1,0 @@
-aqui ficará a documentação do diretório de controle; 
