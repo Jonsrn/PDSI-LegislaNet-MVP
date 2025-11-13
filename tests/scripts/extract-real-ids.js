@@ -63,9 +63,16 @@ async function extractRealIds() {
     const tokens = {
       super_admin: await login('super_admin'),
       admin_camara: await login('admin_camara'),
-      tv: await login('tv'),
-      vereador: await login('vereador', TABLET_BASE_URL)
+      tv: await login('tv')
     };
+
+    // Tentar login vereador (tablet) - não crítico
+    try {
+      tokens.vereador = await login('vereador', TABLET_BASE_URL);
+    } catch (error) {
+      console.log('  ⚠️  Servidor tablet (3003) não disponível - pularemos endpoints do tablet');
+      tokens.vereador = null;
+    }
     console.log('');
 
     // 2. Buscar Câmara (Del)
@@ -149,28 +156,35 @@ async function extractRealIds() {
 
     // 6. Buscar Pauta (do backend tablet - estrutura completa)
     console.log('📍 PASSO 6: Buscando Pauta');
-    const pautasResp = await request(TABLET_BASE_URL)
-      .get('/api/pautas/')
-      .set('Authorization', `Bearer ${tokens.vereador}`);
+    if (tokens.vereador) {
+      const pautasResp = await request(TABLET_BASE_URL)
+        .get('/api/pautas/')
+        .set('Authorization', `Bearer ${tokens.vereador}`);
 
-    if (pautasResp.status !== 200 || !pautasResp.body.data) {
-      throw new Error('Falha ao buscar pautas');
+      if (pautasResp.status === 200 && pautasResp.body.data) {
+        // Estrutura: { data: { pendentes: [...], em_andamento: [...], finalizadas: [...] } }
+        const allPautas = [
+          ...(pautasResp.body.data.pendentes || []),
+          ...(pautasResp.body.data.em_andamento || []),
+          ...(pautasResp.body.data.finalizadas || [])
+        ];
+
+        const pauta = allPautas[0];
+        if (pauta) {
+          realIds.pautaId = pauta.id;
+          console.log(`  ✅ Pauta: ${pauta.nome} (ID: ${realIds.pautaId})`);
+        } else {
+          console.log(`  ⚠️  Nenhuma pauta encontrada`);
+          realIds.pautaId = null;
+        }
+      } else {
+        console.log(`  ⚠️  Falha ao buscar pautas`);
+        realIds.pautaId = null;
+      }
+    } else {
+      console.log(`  ⚠️  Servidor tablet indisponível - pulando busca de pautas`);
+      realIds.pautaId = null;
     }
-
-    // Estrutura: { data: { pendentes: [...], em_andamento: [...], finalizadas: [...] } }
-    const allPautas = [
-      ...(pautasResp.body.data.pendentes || []),
-      ...(pautasResp.body.data.em_andamento || []),
-      ...(pautasResp.body.data.finalizadas || [])
-    ];
-
-    const pauta = allPautas[0];
-    if (!pauta) {
-      throw new Error('Nenhuma pauta encontrada');
-    }
-
-    realIds.pautaId = pauta.id;
-    console.log(`  ✅ Pauta: ${pauta.nome} (ID: ${realIds.pautaId})`);
     console.log('');
 
     // 7. Buscar Orador
