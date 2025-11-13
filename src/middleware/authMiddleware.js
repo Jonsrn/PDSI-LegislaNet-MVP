@@ -38,11 +38,17 @@ const hasPermission = (allowedRoles) => {
     }
 
     const token = authHeader.split(" ")[1];
-    logger.log(`Token extraído: Bearer ${token.substring(0, 10)}...`);
+
+    // Log seguro - não expõe parte do token em produção
+    if (process.env.NODE_ENV === 'development') {
+      logger.log(`Token extraído: Bearer ${token.substring(0, 10)}...`);
+    } else {
+      logger.log('Token extraído: Bearer ****...');
+    }
 
     // --- NOVA VERIFICAÇÃO DE BLACKLIST ---
     if (tokenManager.isBlacklisted(token)) {
-      logger.warn(`FALHA: Tentativa de uso de token na blacklist (deslogado).`);
+      logger.error(`FALHA: Tentativa de uso de token na blacklist (deslogado).`);
       return res.status(401).json({ error: "Token inválido ou expirado." });
     }
 

@@ -301,10 +301,34 @@ const handleRefreshToken = async (req, res) => {
 
     if (userError || !user) {
       logger.error("❌ Token atual inválido:", userError?.message);
-      return res.status(401).json({ error: "Token inválido" });
+      return res.status(401).json({ error: "Token inválido ou expirado" });
     }
 
     logger.log(`✅ Token atual válido para usuário: ${user.id}`);
+
+    // Tenta renovar a sessão usando Supabase Auth
+    // IMPORTANTE: Isso só funciona se o refresh_token estiver disponível no servidor
+    // Como estamos usando JWT stateless, vamos verificar se o token precisa ser renovado
+
+    // Decodifica o token atual para verificar tempo restante
+    const tokenParts = currentToken.split('.');
+    if (tokenParts.length !== 3) {
+      logger.error("❌ Formato de token inválido");
+      return res.status(401).json({ error: "Token malformado" });
+    }
+
+    const payload = JSON.parse(Buffer.from(tokenParts[1], 'base64').toString());
+    const now = Math.floor(Date.now() / 1000);
+    const timeUntilExpiry = payload.exp - now;
+
+    logger.log(`⏰ Token expira em ${Math.floor(timeUntilExpiry / 60)} minutos`);
+
+    // Se o token está muito próximo de expirar (< 30 min), tenta gerar novo
+    // NOTA: Com Supabase, a única forma de obter novo access_token é via refreshSession()
+    // mas isso requer o refresh_token que geralmente fica apenas no cliente
+
+    // Por enquanto, vamos retornar o token atual mas com dados atualizados
+    // A renovação real acontecerá quando o usuário fizer novo login
 
     // Busca dados atualizados do perfil
     const { data: profileData, error: profileError } = await supabaseAdmin
@@ -320,10 +344,6 @@ const handleRefreshToken = async (req, res) => {
         .json({ error: "Perfil de usuário não encontrado." });
     }
 
-    // Como não podemos gerar um novo token manualmente,
-    // vamos retornar o token atual com dados atualizados
-    // O frontend continuará usando o mesmo token
-
     logger.log("✅ Token validado e dados do usuário atualizados!");
 
     return res.status(200).json({
@@ -335,7 +355,8 @@ const handleRefreshToken = async (req, res) => {
         role: profileData.role,
         camara_id: profileData.camara_id,
       },
-      token: currentToken, // Retorna o mesmo token
+      token: currentToken,
+      expiresIn: timeUntilExpiry, // Tempo em segundos até expirar
     });
   } catch (error) {
     logger.error("💥 ERRO INESPERADO NO REFRESH TOKEN:", error);

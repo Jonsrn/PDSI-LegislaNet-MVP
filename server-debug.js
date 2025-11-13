@@ -186,6 +186,7 @@ app.use(
           "https://cdn.socket.io",
           "https://www.youtube.com",
         ],
+        scriptSrcAttr: ["'unsafe-inline'"], // Permite onclick, onload, etc
         imgSrc: ["'self'", "data:", "https:", "blob:"],
         connectSrc: [
           "'self'",
@@ -290,6 +291,17 @@ try {
   serverLogger.error("Stack:", error.stack);
 }
 
+// 5.5. Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    service: "web-backend",
+    version: "1.0.0",
+  });
+});
+serverLogger.log("5.5️⃣ Health check endpoint registrado!");
+
 // 6. Servir uploads (pautas e vereadores)
 serverLogger.log("7️⃣ Registrando pasta de uploads...");
 app.use(
@@ -297,6 +309,16 @@ app.use(
   express.static(path.join(__dirname, "uploads"), {
     maxAge: "1h", // Cache de 1 hora para uploads
     etag: true,
+  })
+);
+
+// 6.5. Servir scripts de teste
+serverLogger.log("7.5️⃣ Registrando pasta de scripts de teste...");
+app.use(
+  "/scripts",
+  express.static(path.join(__dirname, "scripts"), {
+    maxAge: "0", // Sem cache para scripts de teste
+    etag: false,
   })
 );
 

@@ -2,9 +2,19 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
-
+CREATE TABLE public.auth_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  last_used_at timestamp with time zone,
+  expires_at timestamp with time zone,
+  device_type text,
+  refresh_token_hash text NOT NULL,
+  revoked boolean NOT NULL DEFAULT false,
+  ip text,
+  user_agent text,
+  CONSTRAINT auth_sessions_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.camaras (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   nome_camara text NOT NULL,
@@ -106,6 +116,16 @@ CREATE TABLE public.sessoes (
   CONSTRAINT sessoes_pkey PRIMARY KEY (id),
   CONSTRAINT sessoes_camara_id_fkey FOREIGN KEY (camara_id) REFERENCES public.camaras(id)
 );
+CREATE TABLE public.tv_displays (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid,
+  camara_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  last_seen_at timestamp with time zone,
+  CONSTRAINT tv_displays_pkey PRIMARY KEY (id),
+  CONSTRAINT tv_displays_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id),
+  CONSTRAINT tv_displays_camara_id_fkey FOREIGN KEY (camara_id) REFERENCES public.camaras(id)
+);
 CREATE TABLE public.vereadores (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   profile_id uuid NOT NULL UNIQUE,
@@ -136,16 +156,6 @@ CREATE TABLE public.votos (
   CONSTRAINT votos_vereador_id_fkey FOREIGN KEY (vereador_id) REFERENCES public.vereadores(id),
   CONSTRAINT votos_partido_id_no_voto_fkey FOREIGN KEY (partido_id_no_voto) REFERENCES public.partidos(id)
 );
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
 
 
 COMMENT ON SCHEMA "public" IS 'standard public schema';

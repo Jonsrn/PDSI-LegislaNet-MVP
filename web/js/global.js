@@ -383,10 +383,10 @@ function shouldRefreshToken(tokenPayload) {
 
   const now = Math.floor(Date.now() / 1000);
   const timeUntilExpiry = tokenPayload.exp - now;
-  const sixHours = 6 * 60 * 60; // 6 horas em segundos
+  const thirtyMinutes = 30 * 60; // 30 minutos em segundos
 
-  // Se faltam menos de 6 horas para expirar, vamos validar
-  return timeUntilExpiry <= sixHours;
+  // Token dura 3h (10800s), renova quando faltam 30 minutos ou menos
+  return timeUntilExpiry <= thirtyMinutes;
 }
 
 /**
@@ -544,9 +544,13 @@ async function protectPage(options = {}) {
   // Verifica se precisa renovar em breve
   else if (shouldRefreshToken(tokenPayload)) {
     console.log("[AUTH_GUARD] 🔄 Token próximo do vencimento, renovando...");
-    refreshAuthToken().catch((error) => {
+    try {
+      await refreshAuthToken();
+      console.log("[AUTH_GUARD] ✅ Token renovado preventivamente");
+    } catch (error) {
       console.warn("[AUTH_GUARD] ⚠️ Renovação automática falhou:", error);
-    });
+      // Token ainda válido, não bloqueia acesso
+    }
   }
 
   // Valida e carrega dados do usuário
