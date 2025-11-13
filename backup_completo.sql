@@ -1084,4 +1084,66 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 
 
 
+--
+-- Data for Name: profiles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+-- Usuarios de teste para desenvolvimento
+-- IMPORTANTE: Remover ou alterar senhas em producao!
+
+-- Super Admin
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000001'::uuid,
+  'Super Administrador',
+  'superadmin@legislanet.com',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: admin123
+  'super_admin',
+  NULL,
+  NOW()
+);
+
+-- Admin Camara (exemplo)
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000002'::uuid,
+  'Administrador Camara',
+  'admin@camara.gov.br',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: admin123
+  'admin_camara',
+  NULL, -- Deve ser associado a uma camara especifica
+  NOW()
+);
+
+-- Vereador (exemplo)
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000003'::uuid,
+  'Vereador Teste',
+  'vereador@camara.gov.br',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: vereador123
+  'vereador',
+  NULL, -- Deve ser associado a uma camara especifica
+  NOW()
+);
+
+-- TV/Display (exemplo)
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000004'::uuid,
+  'TV Display',
+  'tv@camara.gov.br',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: tv123
+  'tv',
+  NULL, -- Pode ser associado a uma camara especifica
+  NOW()
+);
+
+--
+-- Nota: Os hashes de senha acima sao exemplos genericos.
+-- Para gerar hashes reais de bcrypt, use:
+--   Node.js: const bcrypt = require('bcrypt'); bcrypt.hashSync('senha', 10);
+--   Python: import bcrypt; bcrypt.hashpw(b'senha', bcrypt.gensalt(10));
+--
+
 RESET ALL;
