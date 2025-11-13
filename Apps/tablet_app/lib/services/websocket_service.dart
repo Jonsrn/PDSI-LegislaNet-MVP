@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
@@ -12,7 +11,7 @@ class WebSocketService {
 
   WebSocketService._();
 
-  IO.Socket? _socket;
+  io.Socket? _socket;
   bool _isConnected = false;
   Timer? _reconnectTimer;
   String? _currentPautaId;
@@ -59,7 +58,7 @@ class WebSocketService {
 
       print('🔌 Conectando ao WebSocket...');
 
-      _socket = IO.io('${AuthService.baseUrl}', {
+      _socket = io.io(AuthService.baseUrl, {
         'transports': ['websocket', 'polling'],
         'auth': {'token': token},
         'timeout': 3000,           // Timeout ultra rápido
@@ -363,7 +362,7 @@ class WebSocketService {
       backgroundColor: backgroundColor,
       textColor: Colors.white,
       fontSize: 14.0,
-      webBgColor: '#${backgroundColor.value.toRadixString(16).substring(2)}', // Garantir cor sólida no web
+      webBgColor: '#${backgroundColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}', // Garantir cor sólida no web
       webPosition: "top",
       webShowClose: false,
     );

@@ -381,10 +381,19 @@ const getVereadoresDaPropriaCamara = async (req, res) => {
 const createVereadorNaPropriaCamara = async (req, res) => {
     const { profile } = req;
     const { nome_parlamentar, email, senha, partido_id, is_presidente, is_vice_presidente } = req.body;
-    
+
+    // Validação de campos obrigatórios
+    if (!nome_parlamentar || !email || !senha || !partido_id) {
+        logger.error('Campos obrigatórios faltando na requisição');
+        return res.status(400).json({
+            error: 'Campos obrigatórios faltando',
+            required: ['nome_parlamentar', 'email', 'senha', 'partido_id']
+        });
+    }
+
     // Processar foto se foi enviada
     const foto_url = req.file ? req.file.url : null;
-    
+
     logger.log(`Iniciando cadastro de novo vereador: ${email} para a câmara ${profile.camara_id}`);
     let createdAuthUserId = null;
 

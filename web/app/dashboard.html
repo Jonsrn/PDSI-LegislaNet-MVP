@@ -148,19 +148,19 @@
         flex-direction: column;
         gap: 8px;
       }
-      
+
       .pauta-detail-line {
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
-      
+
       .pauta-detail-label {
         font-weight: 600;
         color: var(--primary-text);
         min-width: 80px;
       }
-      
+
       .pauta-detail-value {
         color: var(--secondary-text);
         text-align: right;
@@ -176,19 +176,19 @@
         text-align: center;
         white-space: nowrap;
       }
-      
+
       .status-badge-new.pendente {
         background-color: rgba(240, 227, 51, 0.2);
         color: rgb(233, 241, 110);
         border: 1px solid rgba(240, 227, 51, 0.4);
       }
-      
+
       .status-badge-new.em-votacao {
         background-color: rgba(88, 166, 255, 0.2);
         color: aqua;
         border: 1px solid rgba(88, 166, 255, 0.4);
       }
-      
+
       .status-badge-new.finalizada {
         background-color: rgba(46, 160, 67, 0.2);
         color: #71e67f;
@@ -205,19 +205,19 @@
         text-align: center;
         white-space: nowrap;
       }
-      
+
       .situacao-badge.aprovado {
         background-color: rgba(46, 160, 67, 0.2);
         color: #71e67f;
         border: 1px solid rgba(46, 160, 67, 0.4);
       }
-      
+
       .situacao-badge.reprovado {
         background-color: rgba(218, 54, 51, 0.2);
         color: #f85149;
         border: 1px solid rgba(218, 54, 51, 0.4);
       }
-      
+
       .situacao-badge.nao-votada {
         background-color: rgba(108, 117, 125, 0.2);
         color: #adb5bd;
@@ -247,7 +247,6 @@
         border-color: rgba(218, 54, 51, 0.4);
         flex-shrink: 0; /* Não encolhe quando há pouco espaço */
       }
-
     </style>
 
     <script src="../js/global.js"></script>
@@ -279,14 +278,17 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        // --- 2. PROTEÇÃO DE PÁGINA APLICADA ---
-        // A função `protectPage()` é chamada primeiro. Se o usuário não estiver
-        // logado, será redirecionado e o restante do script não será executado.
+        // --- 2. PROTEÇÃO DE PÁGINA APLICADA COM VALIDAÇÃO DE ROLE ---
+        // A função `protectPage()` é chamada primeiro com validação específica para admin_camara
         try {
-          protectPage();
+          await protectPage({
+            allowedRoles: ["admin_camara"],
+            requireAuth: true,
+            autoRedirect: true,
+          });
         } catch (e) {
           console.error(e.message);
-          return; // Interrompe a execução se não estiver autenticado.
+          return; // Interrompe a execução se não estiver autenticado ou autorizado.
         }
 
         // Se a execução continuar, o usuário está autenticado.
@@ -327,7 +329,7 @@
 
         try {
           console.log("🔄 [DASHBOARD] Iniciando carregamento de pautas...");
-          
+
           const response = await fetch(
             `/api/pautas?page=${page}&limit=${PAUTAS_PER_PAGE}&sortBy=created_at&sortOrder=desc`,
             {
@@ -341,26 +343,38 @@
           console.log("📡 [DASHBOARD] Response status:", response.status);
 
           if (response.status === 401) {
-            console.log("❌ [DASHBOARD] Token inválido - redirecionando para login");
+            console.log(
+              "❌ [DASHBOARD] Token inválido - redirecionando para login"
+            );
             localStorage.clear();
             window.location.href = "/app/login.html";
             return;
           }
 
           if (!response.ok) {
-            console.error("❌ [DASHBOARD] Erro na resposta:", response.status, response.statusText);
+            console.error(
+              "❌ [DASHBOARD] Erro na resposta:",
+              response.status,
+              response.statusText
+            );
             throw new Error(`Falha na comunicação com o servidor.`);
           }
 
           const responseData = await response.json();
           console.log("📦 [DASHBOARD] Dados recebidos da API:", responseData);
-          
+
           const { data: allPautas, pagination } = responseData;
-          console.log("📋 [DASHBOARD] Total de pautas recebidas:", allPautas?.length || 0);
+          console.log(
+            "📋 [DASHBOARD] Total de pautas recebidas:",
+            allPautas?.length || 0
+          );
           console.log("📋 [DASHBOARD] Paginação:", pagination);
 
           if (!allPautas || !Array.isArray(allPautas)) {
-            console.error("❌ [DASHBOARD] Dados de pautas inválidos:", allPautas);
+            console.error(
+              "❌ [DASHBOARD] Dados de pautas inválidos:",
+              allPautas
+            );
             throw new Error("Dados de pautas inválidos recebidos do servidor");
           }
 
@@ -371,25 +385,34 @@
               nome: pauta.nome,
               votacao_simbolica: pauta.votacao_simbolica,
               status: pauta.status,
-              resultado_votacao: pauta.resultado_votacao
+              resultado_votacao: pauta.resultado_votacao,
             });
           });
 
           // Manter todas as pautas (incluindo votações simbólicas)
           const pautas = allPautas;
-          console.log("🔍 [DASHBOARD] Total de pautas a serem exibidas:", pautas.length);
+          console.log(
+            "🔍 [DASHBOARD] Total de pautas a serem exibidas:",
+            pautas.length
+          );
 
           // Usar paginação original do servidor
           const filteredPagination = pagination;
 
-          console.log("🎯 [DASHBOARD] Chamando renderPautas com", pautas.length, "pautas");
+          console.log(
+            "🎯 [DASHBOARD] Chamando renderPautas com",
+            pautas.length,
+            "pautas"
+          );
           await renderPautas(pautas);
-          
+
           // Configurar paginação usando pagination.js
-          const paginationContainer = document.getElementById("pagination-container");
+          const paginationContainer = document.getElementById(
+            "pagination-container"
+          );
           if (filteredPagination && filteredPagination.totalPages > 1) {
             paginationContainer.style.display = "flex";
-            
+
             createPaginationControls({
               containerId: "pagination-controls",
               currentPage: pagination.page,
@@ -411,11 +434,17 @@
 
       async function renderPautas(pautas) {
         const grid = document.getElementById("pautas-grid");
-        console.log("🎨 [DASHBOARD] renderPautas chamada com:", pautas?.length || 0, "pautas");
+        console.log(
+          "🎨 [DASHBOARD] renderPautas chamada com:",
+          pautas?.length || 0,
+          "pautas"
+        );
 
         // Se não houver pautas, chama a função de estado de "vazio"
         if (!pautas || pautas.length === 0) {
-          console.log("📭 [DASHBOARD] Nenhuma pauta para renderizar - mostrando estado vazio");
+          console.log(
+            "📭 [DASHBOARD] Nenhuma pauta para renderizar - mostrando estado vazio"
+          );
           renderEmptyState(
             grid,
             "Nenhuma pauta encontrada.",
@@ -425,24 +454,38 @@
         }
 
         // Se houver pautas, limpa o grid e renderiza os cards
-        console.log("🧹 [DASHBOARD] Limpando grid e renderizando", pautas.length, "cards");
+        console.log(
+          "🧹 [DASHBOARD] Limpando grid e renderizando",
+          pautas.length,
+          "cards"
+        );
         grid.innerHTML = "";
 
         try {
           // Criar todos os cards em paralelo usando Promise.all
           const cardPromises = pautas.map(async (pauta, index) => {
-            console.log(`🎴 [DASHBOARD] Criando card ${index + 1} para pauta:`, pauta.nome);
+            console.log(
+              `🎴 [DASHBOARD] Criando card ${index + 1} para pauta:`,
+              pauta.nome
+            );
             try {
               const card = await createPautaCard(pauta);
               if (card) {
-                console.log(`✅ [DASHBOARD] Card ${index + 1} criado com sucesso`);
+                console.log(
+                  `✅ [DASHBOARD] Card ${index + 1} criado com sucesso`
+                );
                 return card;
               } else {
-                console.error(`❌ [DASHBOARD] Card ${index + 1} retornou null/undefined`);
+                console.error(
+                  `❌ [DASHBOARD] Card ${index + 1} retornou null/undefined`
+                );
                 return null;
               }
             } catch (error) {
-              console.error(`❌ [DASHBOARD] Erro ao criar card ${index + 1}:`, error);
+              console.error(
+                `❌ [DASHBOARD] Erro ao criar card ${index + 1}:`,
+                error
+              );
               return null;
             }
           });
@@ -456,40 +499,47 @@
               grid.appendChild(card);
 
               // Forçar visibilidade do card
-              card.style.display = 'flex';
-              card.style.visibility = 'visible';
-              card.style.opacity = '1';
+              card.style.display = "flex";
+              card.style.visibility = "visible";
+              card.style.opacity = "1";
 
               console.log(`✅ [DASHBOARD] Card ${index + 1} adicionado ao DOM`);
             }
           });
 
           // Forçar visibilidade do grid e remover classes de loading
-          grid.classList.remove('loading-state', 'error-state', 'empty-state');
-          grid.style.display = 'grid';
-          grid.style.visibility = 'visible';
-          grid.style.opacity = '1';
+          grid.classList.remove("loading-state", "error-state", "empty-state");
+          grid.style.display = "grid";
+          grid.style.visibility = "visible";
+          grid.style.opacity = "1";
 
           // Ativar animação fade-in da seção
-          const contentSection = document.querySelector('.content-section.fade-in');
+          const contentSection = document.querySelector(
+            ".content-section.fade-in"
+          );
           if (contentSection) {
-            contentSection.classList.add('visible');
-            console.log('✨ [DASHBOARD] Seção fade-in ativada');
+            contentSection.classList.add("visible");
+            console.log("✨ [DASHBOARD] Seção fade-in ativada");
           }
 
           // Log adicional para debug
-          console.log('🔍 [DASHBOARD] Grid classes após limpeza:', Array.from(grid.classList));
-          console.log('🔍 [DASHBOARD] Grid computed styles:', {
+          console.log(
+            "🔍 [DASHBOARD] Grid classes após limpeza:",
+            Array.from(grid.classList)
+          );
+          console.log("🔍 [DASHBOARD] Grid computed styles:", {
             display: window.getComputedStyle(grid).display,
             visibility: window.getComputedStyle(grid).visibility,
-            opacity: window.getComputedStyle(grid).opacity
+            opacity: window.getComputedStyle(grid).opacity,
           });
-
         } catch (error) {
-          console.error('❌ [DASHBOARD] Erro ao renderizar cards:', error);
+          console.error("❌ [DASHBOARD] Erro ao renderizar cards:", error);
         }
 
-        console.log("🎯 [DASHBOARD] Renderização concluída. Cards no DOM:", grid.children.length);
+        console.log(
+          "🎯 [DASHBOARD] Renderização concluída. Cards no DOM:",
+          grid.children.length
+        );
 
         // Debug automático após renderização
         setTimeout(() => {
@@ -498,102 +548,129 @@
       }
 
       async function createPautaCard(pauta) {
-      console.log("🎴 [DASHBOARD] createPautaCard INÍCIO - pauta:", pauta.nome);
-      
-      try {
-        const link = document.createElement("a");
-        link.href = `painel_votacao.html?id=${pauta.id}`;
-        link.className = "pauta-card-link fade-in visible";
-        
-        // Processar dados - Mapeamento correto de status para classes CSS
-        const getStatusClass = (status) => {
-          if (!status) return "pendente";
-          
-          const statusMap = {
-            "pendente": "pendente",
-            "em votação": "em-votacao",
-            "finalizada": "finalizada"
+        console.log(
+          "🎴 [DASHBOARD] createPautaCard INÍCIO - pauta:",
+          pauta.nome
+        );
+
+        try {
+          const link = document.createElement("a");
+          link.href = `painel_votacao.html?id=${pauta.id}`;
+          link.className = "pauta-card-link fade-in visible";
+
+          // Processar dados - Mapeamento correto de status para classes CSS
+          const getStatusClass = (status) => {
+            if (!status) return "pendente";
+
+            const statusMap = {
+              pendente: "pendente",
+              "em votação": "em-votacao",
+              finalizada: "finalizada",
+            };
+
+            const normalized = status.toLowerCase().trim();
+            const cssClass = statusMap[normalized] || "pendente";
+
+            return cssClass;
           };
-          
-          const normalized = status.toLowerCase().trim();
-          const cssClass = statusMap[normalized] || "pendente";
-          
-          return cssClass;
-        };
-        
-        const statusClass = getStatusClass(pauta.status);
-        
-        // Mapear resultado para formato da interface
-        const situacaoMap = {
-          'Aprovada': 'Aprovado',
-          'Reprovada': 'Reprovado', 
-          'Não Votada': 'Não votada'
-        };
-        const situacaoTexto = situacaoMap[pauta.resultado_votacao] || 'Não votada';
-        const situacaoClass = situacaoTexto.toLowerCase().replace(/\s+/g, "-").replace(/ã/g, "a");
-        
-        const dataSessao = pauta.sessoes?.data_sessao
-          ? new Date(pauta.sessoes.data_sessao).toLocaleDateString("pt-BR")
-          : "N/A";
-        
-        // Combinar nome e tipo da sessão
-        const nomeSessao = pauta.sessoes?.nome || "N/A";
-        const tipoSessao = pauta.sessoes?.tipo || "";
-        const sessaoCompleta = tipoSessao ? `${nomeSessao} ${tipoSessao}` : nomeSessao;
-        
-        // Contagem de votos real
-        let totalVotos = 0;
-        let votosTexto = "Carregando votos...";
 
-        // Buscar votos reais se a pauta estiver em votação ou finalizada
-        if (pauta.status?.toLowerCase() === 'em votação' || pauta.status?.toLowerCase() === 'finalizada') {
-          try {
-            const authToken = localStorage.getItem("authToken");
-            const votosResponse = await fetch(`/api/votos/pauta/${pauta.id}`, {
-              headers: {
-                Authorization: `Bearer ${authToken}`,
-                "Content-Type": "application/json",
-              },
-            });
+          const statusClass = getStatusClass(pauta.status);
 
-            if (votosResponse.ok) {
-              const votosData = await votosResponse.json();
-              totalVotos = votosData.estatisticas?.total || 0;
-              votosTexto = totalVotos === 0
-                ? "Nenhum voto registrado"
-                : `${totalVotos} ${totalVotos === 1 ? 'voto registrado' : 'votos registrados'}`;
-            } else {
+          // Mapear resultado para formato da interface
+          const situacaoMap = {
+            Aprovada: "Aprovado",
+            Reprovada: "Reprovado",
+            "Não Votada": "Não votada",
+          };
+          const situacaoTexto =
+            situacaoMap[pauta.resultado_votacao] || "Não votada";
+          const situacaoClass = situacaoTexto
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/ã/g, "a");
+
+          const dataSessao = pauta.sessoes?.data_sessao
+            ? new Date(pauta.sessoes.data_sessao).toLocaleDateString("pt-BR")
+            : "N/A";
+
+          // Combinar nome e tipo da sessão
+          const nomeSessao = pauta.sessoes?.nome || "N/A";
+          const tipoSessao = pauta.sessoes?.tipo || "";
+          const sessaoCompleta = tipoSessao
+            ? `${nomeSessao} ${tipoSessao}`
+            : nomeSessao;
+
+          // Contagem de votos real
+          let totalVotos = 0;
+          let votosTexto = "Carregando votos...";
+
+          // Buscar votos reais se a pauta estiver em votação ou finalizada
+          if (
+            pauta.status?.toLowerCase() === "em votação" ||
+            pauta.status?.toLowerCase() === "finalizada"
+          ) {
+            try {
+              const authToken = localStorage.getItem("authToken");
+              const votosResponse = await fetch(
+                `/api/votos/pauta/${pauta.id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              if (votosResponse.ok) {
+                const votosData = await votosResponse.json();
+                totalVotos = votosData.estatisticas?.total || 0;
+                votosTexto =
+                  totalVotos === 0
+                    ? "Nenhum voto registrado"
+                    : `${totalVotos} ${
+                        totalVotos === 1
+                          ? "voto registrado"
+                          : "votos registrados"
+                      }`;
+              } else {
+                votosTexto = "Erro ao carregar votos";
+              }
+            } catch (error) {
+              console.error("Erro ao buscar votos da pauta:", error);
               votosTexto = "Erro ao carregar votos";
             }
-          } catch (error) {
-            console.error('Erro ao buscar votos da pauta:', error);
-            votosTexto = "Erro ao carregar votos";
+          } else {
+            votosTexto = "Votação não iniciada";
           }
-        } else {
-          votosTexto = "Votação não iniciada";
-        }
-        
-        // Badge para votação simbólica (sem ícone, como no template de sessões)
-        const simbolicaBadge = pauta.votacao_simbolica ?
-          '<span class="badge-simbolica">Votação Simbólica</span>' : '';
 
-        link.innerHTML = `
+          // Badge para votação simbólica (sem ícone, como no template de sessões)
+          const simbolicaBadge = pauta.votacao_simbolica
+            ? '<span class="badge-simbolica">Votação Simbólica</span>'
+            : "";
+
+          link.innerHTML = `
           <div class="pauta-card">
             <div class="pauta-card-header">
               <h3 class="pauta-title">${escapeHtml(pauta.nome)}</h3>
               ${simbolicaBadge}
             </div>
-            <p class="pauta-description">${escapeHtml(truncateText(pauta.descricao || "Sem descrição disponível", 120))}</p>
+            <p class="pauta-description">${escapeHtml(
+              truncateText(pauta.descricao || "Sem descrição disponível", 120)
+            )}</p>
 
             <div class="pauta-details">
               <div class="pauta-detail-line">
                 <span class="pauta-detail-label">Autor:</span>
-                <span class="pauta-detail-value">${escapeHtml(pauta.autor || "Não informado")}</span>
+                <span class="pauta-detail-value">${escapeHtml(
+                  pauta.autor || "Não informado"
+                )}</span>
               </div>
 
               <div class="pauta-detail-line">
                 <span class="pauta-detail-label">Status:</span>
-                <span class="status-badge-new ${statusClass}">${pauta.status || "pendente"}</span>
+                <span class="status-badge-new ${statusClass}">${
+            pauta.status || "pendente"
+          }</span>
               </div>
 
               <div class="pauta-detail-line">
@@ -608,7 +685,9 @@
 
               <div class="pauta-detail-line">
                 <span class="pauta-detail-label">Sessão:</span>
-                <span class="pauta-detail-value">${escapeHtml(sessaoCompleta)}</span>
+                <span class="pauta-detail-value">${escapeHtml(
+                  sessaoCompleta
+                )}</span>
               </div>
             </div>
 
@@ -617,21 +696,19 @@
             </div>
           </div>
         `;
-        
-        console.log("✅ [DASHBOARD] createPautaCard SUCESSO");
-        return link;
-        
-      } catch (error) {
-        console.error("❌ [DASHBOARD] Erro em createPautaCard:", error);
-        return null;
-      }
-    }
 
+          console.log("✅ [DASHBOARD] createPautaCard SUCESSO");
+          return link;
+        } catch (error) {
+          console.error("❌ [DASHBOARD] Erro em createPautaCard:", error);
+          return null;
+        }
+      }
 
       function truncateText(text, maxLength) {
-        if (!text || typeof text !== 'string') return '';
+        if (!text || typeof text !== "string") return "";
         if (text.length <= maxLength) return text;
-        return text.substring(0, maxLength).trim() + '...';
+        return text.substring(0, maxLength).trim() + "...";
       }
 
       function escapeHtml(text = "") {
@@ -645,19 +722,22 @@
 
       // FUNÇÃO DE DEBUG - adicionar após as outras funções
       function debugLayout() {
-        console.log('=== DEBUG LAYOUT ===');
-        
-        const grid = document.getElementById('pautas-grid');
-        const cards = document.querySelectorAll('.pauta-card');
-        const links = document.querySelectorAll('.pauta-card-link');
-        
-        console.log('Grid element:', grid);
-        console.log('Grid display:', window.getComputedStyle(grid).display);
-        console.log('Grid visibility:', window.getComputedStyle(grid).visibility);
-        console.log('Grid opacity:', window.getComputedStyle(grid).opacity);
-        console.log('Total cards:', cards.length);
-        console.log('Total links:', links.length);
-        
+        console.log("=== DEBUG LAYOUT ===");
+
+        const grid = document.getElementById("pautas-grid");
+        const cards = document.querySelectorAll(".pauta-card");
+        const links = document.querySelectorAll(".pauta-card-link");
+
+        console.log("Grid element:", grid);
+        console.log("Grid display:", window.getComputedStyle(grid).display);
+        console.log(
+          "Grid visibility:",
+          window.getComputedStyle(grid).visibility
+        );
+        console.log("Grid opacity:", window.getComputedStyle(grid).opacity);
+        console.log("Total cards:", cards.length);
+        console.log("Total links:", links.length);
+
         cards.forEach((card, index) => {
           const styles = window.getComputedStyle(card);
           console.log(`Card ${index + 1}:`, {
@@ -666,28 +746,27 @@
             opacity: styles.opacity,
             width: styles.width,
             height: styles.height,
-            position: styles.position
+            position: styles.position,
           });
         });
-        
+
         // Forçar visibilidade
-        grid.style.display = 'grid';
-        grid.style.visibility = 'visible';
-        grid.style.opacity = '1';
-        
-        cards.forEach(card => {
-          card.style.display = 'flex';
-          card.style.visibility = 'visible';
-          card.style.opacity = '1';
+        grid.style.display = "grid";
+        grid.style.visibility = "visible";
+        grid.style.opacity = "1";
+
+        cards.forEach((card) => {
+          card.style.display = "flex";
+          card.style.visibility = "visible";
+          card.style.opacity = "1";
         });
-        
-        links.forEach(link => {
-          link.style.display = 'flex';
-          link.style.visibility = 'visible';
-          link.style.opacity = '1';
+
+        links.forEach((link) => {
+          link.style.display = "flex";
+          link.style.visibility = "visible";
+          link.style.opacity = "1";
         });
       }
-
     </script>
   </body>
 </html>

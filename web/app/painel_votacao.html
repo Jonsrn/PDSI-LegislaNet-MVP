@@ -211,12 +211,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             // Proteção de página
-            try {
-                protectPage();
-            } catch (e) {
-                console.error(e.message);
-                return;
-            }
+                    // === NOVA AUTENTICAÇÃO COM VALIDAÇÃO DE ROLE ===
+        try {
+          await protectPage({
+            allowedRoles: ['admin_camara'],
+            requireAuth: true,
+            autoRedirect: true
+          });
+        } catch (error) {
+          console.error('[AUTH] Falha na autenticação:', error);
+          return;
+        }
 
             initLayout({
                 title: 'Painel de Votação',

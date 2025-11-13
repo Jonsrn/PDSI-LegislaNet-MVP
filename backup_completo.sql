@@ -2,9 +2,19 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
--- WARNING: This schema is for context only and is not meant to be run.
--- Table order and constraints may not be valid for execution.
-
+CREATE TABLE public.auth_sessions (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  last_used_at timestamp with time zone,
+  expires_at timestamp with time zone,
+  device_type text,
+  refresh_token_hash text NOT NULL,
+  revoked boolean NOT NULL DEFAULT false,
+  ip text,
+  user_agent text,
+  CONSTRAINT auth_sessions_pkey PRIMARY KEY (id)
+);
 CREATE TABLE public.camaras (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   nome_camara text NOT NULL,
@@ -106,6 +116,16 @@ CREATE TABLE public.sessoes (
   CONSTRAINT sessoes_pkey PRIMARY KEY (id),
   CONSTRAINT sessoes_camara_id_fkey FOREIGN KEY (camara_id) REFERENCES public.camaras(id)
 );
+CREATE TABLE public.tv_displays (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id uuid,
+  camara_id uuid NOT NULL,
+  created_at timestamp with time zone DEFAULT now(),
+  last_seen_at timestamp with time zone,
+  CONSTRAINT tv_displays_pkey PRIMARY KEY (id),
+  CONSTRAINT tv_displays_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id),
+  CONSTRAINT tv_displays_camara_id_fkey FOREIGN KEY (camara_id) REFERENCES public.camaras(id)
+);
 CREATE TABLE public.vereadores (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   profile_id uuid NOT NULL UNIQUE,
@@ -136,16 +156,6 @@ CREATE TABLE public.votos (
   CONSTRAINT votos_vereador_id_fkey FOREIGN KEY (vereador_id) REFERENCES public.vereadores(id),
   CONSTRAINT votos_partido_id_no_voto_fkey FOREIGN KEY (partido_id_no_voto) REFERENCES public.partidos(id)
 );
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
 
 
 COMMENT ON SCHEMA "public" IS 'standard public schema';
@@ -1073,5 +1083,67 @@ ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TAB
 
 
 
+
+--
+-- Data for Name: profiles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+-- Usuarios de teste para desenvolvimento
+-- IMPORTANTE: Remover ou alterar senhas em producao!
+
+-- Super Admin
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000001'::uuid,
+  'Super Administrador',
+  'superadmin@legislanet.com',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: admin123
+  'super_admin',
+  NULL,
+  NOW()
+);
+
+-- Admin Camara (exemplo)
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000002'::uuid,
+  'Administrador Camara',
+  'admin@camara.gov.br',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: admin123
+  'admin_camara',
+  NULL, -- Deve ser associado a uma camara especifica
+  NOW()
+);
+
+-- Vereador (exemplo)
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000003'::uuid,
+  'Vereador Teste',
+  'vereador@camara.gov.br',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: vereador123
+  'vereador',
+  NULL, -- Deve ser associado a uma camara especifica
+  NOW()
+);
+
+-- TV/Display (exemplo)
+INSERT INTO public.profiles (id, nome, email, senha_hash, role, camara_id, created_at)
+VALUES (
+  'a0000000-0000-0000-0000-000000000004'::uuid,
+  'TV Display',
+  'tv@camara.gov.br',
+  '$2b$10$XQKYz5H2mZKJxP8YvY.YKuqGz4ZQkQQp0YQmxQkQQp0YQmxQkQQp0', -- Senha: tv123
+  'tv',
+  NULL, -- Pode ser associado a uma camara especifica
+  NOW()
+);
+
+--
+-- Nota: Os hashes de senha acima sao exemplos genericos.
+-- Para gerar hashes reais de bcrypt, use:
+--   Node.js: const bcrypt = require('bcrypt'); bcrypt.hashSync('senha', 10);
+--   Python: import bcrypt; bcrypt.hashpw(b'senha', bcrypt.gensalt(10));
+--
 
 RESET ALL;

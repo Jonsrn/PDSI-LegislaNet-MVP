@@ -216,12 +216,17 @@
         let pautaId = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                protectPage();
-            } catch (e) {
-                console.error(e.message);
-                return;
-            }
+                    // === NOVA AUTENTICAÇÃO COM VALIDAÇÃO DE ROLE ===
+        try {
+          await protectPage({
+            allowedRoles: ['admin_camara'],
+            requireAuth: true,
+            autoRedirect: true
+          });
+        } catch (error) {
+          console.error('[AUTH] Falha na autenticação:', error);
+          return;
+        }
 
             initLayout({
                 title: 'Editar Pauta',

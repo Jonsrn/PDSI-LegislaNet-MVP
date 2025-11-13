@@ -1,0 +1,607 @@
+[
+  {
+    "dados_completos": {
+      "camaraPrincipal": {
+        "id": "a5df7317-35d5-47e0-955f-668862ed00ac",
+        "nome": "Câmara Municipal de Del",
+        "municipio": "Del",
+        "estado": "PI",
+        "brasao_url": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/brasoes-camara/public/camara-1757355212133-898512106.jpg",
+        "is_active": true,
+        "link_facebook": "",
+        "link_instagram": "",
+        "link_youtube": "",
+        "site_oficial": "",
+        "telefone": null,
+        "email_contato": null,
+        "endereco": null
+      },
+      "camaraSecundaria": {
+        "id": "c01e9faf-a8d7-4943-b058-fc8cc545415d",
+        "nome": "Câmara Municipal de Santana",
+        "municipio": "Santana",
+        "estado": "PI"
+      },
+      "usuarios": {
+        "superAdmin": {
+          "id": "d8612e16-98bf-48c0-b173-de6d20e23601",
+          "email": "jffilho618@gmail.com",
+          "nome": "Bomba",
+          "role": "super_admin"
+        },
+        "adminCamaraPrincipal": {
+          "id": "d326d456-63c0-4c55-82e8-9bea6c80bf98",
+          "email": "del@exemplo.com",
+          "nome": "Admin Câmara Municipal de Del",
+          "role": "admin_camara",
+          "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac"
+        },
+        "adminCamaraSecundaria": {
+          "id": "5d318165-b07f-4fac-8604-f4f13367de08",
+          "email": "santana@exemplo.com",
+          "nome": "Admin Câmara Municipal de Santana",
+          "role": "admin_camara",
+          "camaraId": "c01e9faf-a8d7-4943-b058-fc8cc545415d"
+        },
+        "tvCamaraPrincipal": {
+          "id": "525e8ac1-4b5f-444d-a71b-f4f591a938e1",
+          "email": "tv@del.com",
+          "nome": "TV Câmara Municipal de Del",
+          "role": "tv",
+          "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac"
+        },
+        "tvCamaraSecundaria": null,
+        "vereadoresCamaraPrincipal": [
+          {
+            "id": "3fbd1c0a-f3ff-4b38-879a-61303e81ee4a",
+            "email": "ramon@del.com",
+            "nome": "Ramon Belo",
+            "role": "vereador",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "nomeParlamentar": "Ramon Belo",
+            "isPresidente": true,
+            "isVicePresidente": false,
+            "isActive": true,
+            "partidoId": "66d032e2-734e-45c8-a3a6-2248461f0dd6"
+          },
+          {
+            "id": "b6032bdb-89d4-43ea-ab9b-3c1931ff37da",
+            "email": "deassis@del.com",
+            "nome": "De Assis Dantas",
+            "role": "vereador",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "vereadorId": "8e625a7d-5613-49e1-acf0-f787616431c5",
+            "nomeParlamentar": "De Assis Dantas",
+            "isPresidente": false,
+            "isVicePresidente": false,
+            "isActive": true,
+            "partidoId": "ee1bdf97-c85f-4a33-b8d1-0a46110730c3"
+          },
+          {
+            "id": "805aa202-b8e1-4e58-9ba2-f44b900e7673",
+            "email": "joaolourende@del.com",
+            "nome": "João Lourende",
+            "role": "vereador",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "vereadorId": "7b1c755a-580e-46e9-9dbf-d6cc6350e076",
+            "nomeParlamentar": "João Lourende",
+            "isPresidente": false,
+            "isVicePresidente": true,
+            "isActive": true,
+            "partidoId": "3d59966d-5761-4c84-8168-4f65064b8ed0"
+          },
+          {
+            "id": "07c49186-908d-43eb-bb55-4c51f6945fd0",
+            "email": "toinho@del.com",
+            "nome": "Toinho De Quinca",
+            "role": "vereador",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "vereadorId": "a2bfe5f9-a334-456f-be2e-333df3634561",
+            "nomeParlamentar": "Toinho De Quinca",
+            "isPresidente": false,
+            "isVicePresidente": false,
+            "isActive": true,
+            "partidoId": "ee1bdf97-c85f-4a33-b8d1-0a46110730c3"
+          },
+          {
+            "id": "c572e6b2-0c0e-4d49-9237-c1217dc67d3a",
+            "email": "zewilson@del.com",
+            "nome": "Zé wilson",
+            "role": "vereador",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "vereadorId": "1c461234-ce59-4137-83ba-20c37f6fb8b2",
+            "nomeParlamentar": "Zé wilson",
+            "isPresidente": false,
+            "isVicePresidente": false,
+            "isActive": true,
+            "partidoId": "3d59966d-5761-4c84-8168-4f65064b8ed0"
+          },
+          {
+            "id": "87ca9baf-ffea-4042-ac0b-47730e8e4401",
+            "email": "marcilene@del.com",
+            "nome": "Marcilene",
+            "role": "vereador",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "vereadorId": "7fab49e6-0141-4f7c-b463-b0c80f786fd9",
+            "nomeParlamentar": "Marcilene",
+            "isPresidente": false,
+            "isVicePresidente": false,
+            "isActive": true,
+            "partidoId": "3d59966d-5761-4c84-8168-4f65064b8ed0"
+          },
+          {
+            "id": "749a23a3-b7cc-47b7-b756-016f3758318d",
+            "email": "everaldo@del.com",
+            "nome": "Everealdo Gonçalves",
+            "role": "vereador",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "nomeParlamentar": "Everealdo Gonçalves",
+            "isPresidente": false,
+            "isVicePresidente": false,
+            "isActive": true,
+            "partidoId": "ee1bdf97-c85f-4a33-b8d1-0a46110730c3"
+          }
+        ],
+        "vereadoresCamaraSecundaria": [
+          {
+            "id": "7600555b-1efd-4596-bded-7866102ac3af",
+            "email": "felipe@santana.com",
+            "nome": "Felipe Du Leite",
+            "role": "vereador",
+            "camaraId": "c01e9faf-a8d7-4943-b058-fc8cc545415d",
+            "vereadorId": "4cbed3b2-fcef-4798-8473-ba4c958ca110",
+            "nomeParlamentar": "Felipe Du Leite"
+          },
+          {
+            "id": "3b9ce1dc-5f46-43a8-8291-4781be6ee4c0",
+            "email": "netinho@gmail.com",
+            "nome": "Netinho do Mel",
+            "role": "vereador",
+            "camaraId": "c01e9faf-a8d7-4943-b058-fc8cc545415d",
+            "vereadorId": "46d760b0-314b-43a0-b3d4-5d4483aea8d8",
+            "nomeParlamentar": "Netinho do Mel"
+          }
+        ]
+      },
+      "sessoes": {
+        "camaraPrincipal": [
+          {
+            "id": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "nome": "2º sessão",
+            "tipo": "Ordinária",
+            "status": "Agendada",
+            "dataSessao": "2025-11-01T00:00:00+00:00",
+            "createdAt": "2025-09-01T17:18:04.568681+00:00"
+          },
+          {
+            "id": "7781efc7-5690-4245-bee4-aab2c23fbec1",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "nome": "300ª Sessão Ordinária",
+            "tipo": "Ordinária",
+            "status": "Agendada",
+            "dataSessao": "2025-10-18T00:00:00+00:00",
+            "createdAt": "2025-10-10T23:54:27.937753+00:00"
+          },
+          {
+            "id": "c9adab8c-fe86-49c2-b1da-a137ba540b34",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "nome": "883ª Sessão Ordinária",
+            "tipo": "Ordinária",
+            "status": "Agendada",
+            "dataSessao": "2025-10-18T00:00:00+00:00",
+            "createdAt": "2025-10-10T23:53:21.363296+00:00"
+          },
+          {
+            "id": "e8d112b0-edfb-4163-87b9-bc856074ec48",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "nome": "426ª Sessão Ordinária",
+            "tipo": "Ordinária",
+            "status": "Agendada",
+            "dataSessao": "2025-10-18T00:00:00+00:00",
+            "createdAt": "2025-10-10T22:11:11.754906+00:00"
+          },
+          {
+            "id": "b5752dd9-43bc-44db-a4b2-8a22b8e23daa",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "nome": "567ª Sessão Ordinária",
+            "tipo": "Ordinária",
+            "status": "Agendada",
+            "dataSessao": "2025-10-18T00:00:00+00:00",
+            "createdAt": "2025-10-11T00:19:32.96012+00:00"
+          }
+        ],
+        "camaraSecundaria": null
+      },
+      "pautas": {
+        "camaraPrincipal": [
+          {
+            "id": "2a10b96d-65a5-4b1f-83e8-287ed9bbf370",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-11T01:42:26.419526+00:00"
+          },
+          {
+            "id": "9fbe68f0-2ae9-4c9e-a080-459e7ba99c99",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-11T01:26:31.185765+00:00"
+          },
+          {
+            "id": "72dfedb9-50c9-4c11-983a-d2e8f11ea92d",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-11T01:24:18.391059+00:00"
+          },
+          {
+            "id": "c4fa1c30-c0f1-4025-a767-4cb24cb56404",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-11T01:18:06.802303+00:00"
+          },
+          {
+            "id": "3b0637f0-ab68-45a9-a5da-bd680fa0b82b",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-11T01:13:09.952974+00:00"
+          },
+          {
+            "id": "2899aa51-1e48-455f-a00b-69b42e60e1da",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-11T00:21:36.658594+00:00"
+          },
+          {
+            "id": "9fab6b14-e9ec-4710-974b-746dac6cabe6",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-11T00:19:26.218061+00:00"
+          },
+          {
+            "id": "cd8d2acc-bdab-4a8b-a048-9a8653203f2f",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-10T23:54:18.596552+00:00"
+          },
+          {
+            "id": "5432b853-5e2c-4d8a-b538-82a4bbd79638",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-10T23:53:13.588177+00:00"
+          },
+          {
+            "id": "eb203402-8f47-4c99-ba56-42eb505ef20d",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "nome": "Pauta Teste",
+            "descricao": "Descrição da pauta teste",
+            "status": "Pendente",
+            "votacaoSimbolica": false,
+            "resultadoVotacao": "Não Votada",
+            "autor": "Autor Teste",
+            "createdAt": "2025-10-10T22:11:05.212771+00:00"
+          }
+        ],
+        "camaraSecundaria": null
+      },
+      "votos": {
+        "camaraPrincipal": [
+          {
+            "id": "7d80247b-1744-42a8-b52e-8bccf45bd21e",
+            "pautaId": "59cc774c-0684-4bfb-8817-12bc42e2d955",
+            "vereadorId": "7fab49e6-0141-4f7c-b463-b0c80f786fd9",
+            "voto": "SIM",
+            "createdAt": "2025-10-10T00:23:48.817281+00:00"
+          },
+          {
+            "id": "4fafe80b-edca-4b5e-8973-8d80e342d5a4",
+            "pautaId": "7d56862a-0090-4b18-b936-c7e7ca625ee9",
+            "vereadorId": "7fab49e6-0141-4f7c-b463-b0c80f786fd9",
+            "voto": "SIM",
+            "createdAt": "2025-10-07T14:52:45.165351+00:00"
+          },
+          {
+            "id": "01246252-5af7-4ba5-9e83-52d3ede1e3af",
+            "pautaId": "7d56862a-0090-4b18-b936-c7e7ca625ee9",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "SIM",
+            "createdAt": "2025-10-07T14:52:43.133462+00:00"
+          },
+          {
+            "id": "8b421783-3b0e-483b-b61a-f5887fea3582",
+            "pautaId": "7d56862a-0090-4b18-b936-c7e7ca625ee9",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "SIM",
+            "createdAt": "2025-10-07T14:52:42.780875+00:00"
+          },
+          {
+            "id": "5300bcf6-b852-4a8b-b6ba-b8c8addecc85",
+            "pautaId": "36d42f0b-7cdb-4849-ba56-ff3801bed998",
+            "vereadorId": "7fab49e6-0141-4f7c-b463-b0c80f786fd9",
+            "voto": "NÃO",
+            "createdAt": "2025-10-07T14:03:54.831647+00:00"
+          },
+          {
+            "id": "19a77cd3-db89-49dc-9510-0ab38f078f80",
+            "pautaId": "7708fac0-a1f3-4ffe-bfe1-1eb0772faaad",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "SIM",
+            "createdAt": "2025-10-07T13:47:17.556798+00:00"
+          },
+          {
+            "id": "9efdf0a0-451e-4ccc-9223-393b24b773e9",
+            "pautaId": "7708fac0-a1f3-4ffe-bfe1-1eb0772faaad",
+            "vereadorId": "7fab49e6-0141-4f7c-b463-b0c80f786fd9",
+            "voto": "SIM",
+            "createdAt": "2025-10-07T13:47:14.821159+00:00"
+          },
+          {
+            "id": "8f68f749-eb7d-4dd7-8666-5c87dd3b843d",
+            "pautaId": "7708fac0-a1f3-4ffe-bfe1-1eb0772faaad",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "SIM",
+            "createdAt": "2025-10-07T13:47:13.616509+00:00"
+          },
+          {
+            "id": "c5f84555-388c-4347-8020-53f01bc910af",
+            "pautaId": "92e5a5ab-d0d2-4346-b5ae-482a53e5d9a7",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "NÃO",
+            "createdAt": "2025-10-06T15:11:18.526536+00:00"
+          },
+          {
+            "id": "3a836c79-48ce-4125-8ac4-5a90ed662023",
+            "pautaId": "92e5a5ab-d0d2-4346-b5ae-482a53e5d9a7",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "NÃO",
+            "createdAt": "2025-10-06T15:11:18.437284+00:00"
+          },
+          {
+            "id": "531f9361-0af1-466a-951a-4836e7536bef",
+            "pautaId": "362a7179-7fa3-4ed5-b9f2-382d353be881",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "NÃO",
+            "createdAt": "2025-10-06T14:51:59.989841+00:00"
+          },
+          {
+            "id": "bcebf949-7796-4ddd-ba91-6e7644f8e2d5",
+            "pautaId": "362a7179-7fa3-4ed5-b9f2-382d353be881",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "SIM",
+            "createdAt": "2025-10-06T14:51:59.31396+00:00"
+          },
+          {
+            "id": "bb0cfd58-6649-4ece-b6e5-d7a51b2b1b4d",
+            "pautaId": "a2d9a2d8-e660-4d33-9a61-808ea37cb504",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "ABSTENÇÃO",
+            "createdAt": "2025-10-06T14:14:06.440499+00:00"
+          },
+          {
+            "id": "01c9bc60-711d-452c-b1ba-3d496bf7f52e",
+            "pautaId": "a2d9a2d8-e660-4d33-9a61-808ea37cb504",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "NÃO",
+            "createdAt": "2025-10-06T14:14:05.845089+00:00"
+          },
+          {
+            "id": "b32b5a53-62f9-4df5-a2b8-4ed01029fe45",
+            "pautaId": "2c4736c3-cb94-4d2a-8d49-d89354a79473",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "ABSTENÇÃO",
+            "createdAt": "2025-10-06T13:55:35.85242+00:00"
+          },
+          {
+            "id": "e902b4f2-9aa6-4a6d-9d6a-bcd3a13582b5",
+            "pautaId": "2c4736c3-cb94-4d2a-8d49-d89354a79473",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "SIM",
+            "createdAt": "2025-10-06T13:55:34.093334+00:00"
+          },
+          {
+            "id": "5ba7ecde-d22b-4cb5-b239-abaa4a32ec63",
+            "pautaId": "59cc774c-0684-4bfb-8817-12bc42e2d955",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "NÃO",
+            "createdAt": "2025-10-06T13:34:35.378457+00:00"
+          },
+          {
+            "id": "6d75003e-a01c-4573-829e-9e0e4506b815",
+            "pautaId": "59cc774c-0684-4bfb-8817-12bc42e2d955",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "NÃO",
+            "createdAt": "2025-10-06T13:34:33.870561+00:00"
+          },
+          {
+            "id": "9303df18-cdad-4e4c-9f8f-56b8f317e161",
+            "pautaId": "36d42f0b-7cdb-4849-ba56-ff3801bed998",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "voto": "ABSTENÇÃO",
+            "createdAt": "2025-10-06T13:18:25.675915+00:00"
+          },
+          {
+            "id": "d0cc10cc-f039-42b2-a4b4-1d04d4eb54fa",
+            "pautaId": "36d42f0b-7cdb-4849-ba56-ff3801bed998",
+            "vereadorId": "fa591a8b-6a95-4d5c-9d0a-51794079b7ec",
+            "voto": "NÃO",
+            "createdAt": "2025-10-06T13:18:23.648113+00:00"
+          }
+        ],
+        "camaraSecundaria": null
+      },
+      "partidos": [
+        {
+          "id": "ee1bdf97-c85f-4a33-b8d1-0a46110730c3",
+          "nome": "Movimento Democrático Brasileiro",
+          "sigla": "MDB",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/1756155426298-MDB-logo-848x477.webp"
+        },
+        {
+          "id": "c7b31ab5-a912-4977-ac2a-1d27c68134e8",
+          "nome": "Partido Novo",
+          "sigla": "NOVO",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756232389164-images%20(2).png"
+        },
+        {
+          "id": "1ea28cc3-2d6d-473b-a5b9-87ed5d9904dc",
+          "nome": "Partido Comunista do Brasil",
+          "sigla": "PCDOASDA",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/partido-1757353382991-629778932.png"
+        },
+        {
+          "id": "ff1e889c-aacf-4a71-b86a-07d5c9b4cec5",
+          "nome": "Partido Democrático Trabalhista",
+          "sigla": "PDT",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756236554794-PDT.png"
+        },
+        {
+          "id": "3d59966d-5761-4c84-8168-4f65064b8ed0",
+          "nome": "Partido Progressistas",
+          "sigla": "PP",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756188302282-352231494_3445201059131748_5822496982090582916_n.jpg"
+        },
+        {
+          "id": "96f3cddc-fb07-487b-a109-d1f82e5102d9",
+          "nome": "Partido Renovação Democrática",
+          "sigla": "PRD",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756235609037-images%20(3).png"
+        },
+        {
+          "id": "1c26e6b1-db19-461f-aa9f-1f8d747f0a37",
+          "nome": "Partido Renovador Trabalhista Brasileiro",
+          "sigla": "PRTB",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756232789352-56cd0016f3c797bf3120a03158faeb5b.png"
+        },
+        {
+          "id": "33842358-dbda-4da8-b969-523a3c64551e",
+          "nome": "Partido Socialista Brasileiro",
+          "sigla": "PSB",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756237942379-icone-psb40.png"
+        },
+        {
+          "id": "d8583252-9388-4837-990d-85b16e90cfcb",
+          "nome": "Partido Social Democrático",
+          "sigla": "PSD",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756203191695-images%20(1).png"
+        },
+        {
+          "id": "ebffca98-df92-42ea-af87-f33b842e1f84",
+          "nome": "Partido da Social Democracia Brasileira",
+          "sigla": "PSDB",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756193529686-169290454864e7ac6433947_1692904548_3x2_md.jpg"
+        },
+        {
+          "id": "970f8b7b-a83c-46ce-8da2-7018982d385b",
+          "nome": "Partido Socialismo e Liberdade",
+          "sigla": "PSOL",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756232409632-Bandeira_Amarela-Roxa_PSOL.png"
+        },
+        {
+          "id": "66d032e2-734e-45c8-a3a6-2248461f0dd6",
+          "nome": "Partido do Trabalhador",
+          "sigla": "PT",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/1756155372676-Pt_flag.png"
+        },
+        {
+          "id": "b9676504-606d-4967-8ac6-5dfd77e74788",
+          "nome": "Partido Verde",
+          "sigla": "PV",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756555305485-pv2.jpg"
+        },
+        {
+          "id": "c113f1c5-eb33-4ded-bc80-7e63d6703547",
+          "nome": "Rede Sustentabilidade",
+          "sigla": "REDE",
+          "logoUrl": "https://uplgoqkmvkdslhslrski.supabase.co/storage/v1/object/public/logos-partidos/public/logos-partidos/1756555190923-arton51472.jpg"
+        }
+      ],
+      "oradores": {
+        "camaraPrincipal": [
+          {
+            "id": "0740cec7-43ef-4b16-be1e-1caf159615e0",
+            "sessaoId": "3c2963ac-b638-4456-a1eb-7a378837afff",
+            "vereadorId": "7b1c755a-580e-46e9-9dbf-d6cc6350e076",
+            "ordem": 1,
+            "tempoFalaMinutos": 8
+          },
+          {
+            "id": "d96aa0c5-46a1-4c64-97bd-2e2fb5219191",
+            "sessaoId": "8875fbb0-0289-457b-b485-567660809f68",
+            "vereadorId": "3d730f64-259f-4efe-a024-fcb9b0a86ace",
+            "ordem": 1,
+            "tempoFalaMinutos": 5
+          }
+        ]
+      },
+      "tvDisplays": {
+        "camaraPrincipal": [
+          {
+            "id": "d4cc4940-3ce6-4ccd-805a-18d89247e47e",
+            "profileId": "525e8ac1-4b5f-444d-a71b-f4f591a938e1",
+            "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+            "lastSeenAt": null
+          }
+        ],
+        "camaraSecundaria": null
+      },
+      "livestreams": {
+        "camaraPrincipal": {
+          "id": "e6fdd250-d4b9-4ec6-b373-7795f89d2728",
+          "camaraId": "a5df7317-35d5-47e0-955f-668862ed00ac",
+          "youtubeVideoId": "tYmnlcGndug",
+          "youtubeVideoUrl": "https://www.youtube.com/watch?v=tYmnlcGndug",
+          "status": "ended",
+          "title": "GTA RP AO VIVO ! LADRÃO PROFISSIONAL !!",
+          "viewerCount": 0,
+          "isCurrent": false
+        }
+      }
+    }
+  }
+]

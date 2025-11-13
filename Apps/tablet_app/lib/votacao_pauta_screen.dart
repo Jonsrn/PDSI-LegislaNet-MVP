@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'dart:async';
 import 'services/auth_service.dart';
 import 'services/websocket_service.dart';
@@ -24,7 +22,6 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
   bool _isUserConnected = true;
   bool _isVoting = false;
   bool _votoFoiRegistrado = false; // Flag para indicar se um voto foi registrado
-  Map<String, dynamic>? _vereadorData;
 
   // Estatísticas em tempo real
   Map<String, dynamic>? _estatisticas;
@@ -57,12 +54,8 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
 
   Future<void> _loadVereadorData() async {
     try {
-      final vereadorData = await AuthService.getVereadorDetails();
-      if (mounted) {
-        setState(() {
-          _vereadorData = vereadorData;
-        });
-      }
+      await AuthService.getVereadorDetails();
+      // Dados carregados com sucesso (não utilizados no momento)
     } catch (e) {
       print('Erro ao carregar dados do vereador: $e');
     }
@@ -292,6 +285,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
           _votoFoiRegistrado = true; // Marcar que um voto foi registrado
         });
 
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Voto registrado com sucesso!'),
@@ -307,6 +301,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
         throw Exception(errorMessage);
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erro ao registrar voto: $e'),
@@ -413,7 +408,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.2),
+                    color: Colors.blue.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.blue, width: 1),
                   ),
@@ -517,7 +512,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? cor.withOpacity(0.15) : const Color(0xFF0d1117),
+          color: isSelected ? cor.withValues(alpha: 0.15) : const Color(0xFF0d1117),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? cor : Colors.grey[700]!,
@@ -525,7 +520,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
           ),
           boxShadow: isSelected ? [
             BoxShadow(
-              color: cor.withOpacity(0.3),
+              color: cor.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -572,7 +567,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
                     descricao,
                     style: TextStyle(
                       fontSize: 14,
-                      color: isSelected ? cor.withOpacity(0.8) : Colors.grey[400],
+                      color: isSelected ? cor.withValues(alpha: 0.8) : Colors.grey[400],
                     ),
                   ),
                 ],
@@ -587,7 +582,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
   Widget _buildVoteButton() {
     final isDisabled = _votoSelecionado == VotoOpcao.nenhum || _isVoting;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 56,
       child: ElevatedButton(
@@ -745,9 +740,9 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.3)),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -766,7 +761,7 @@ class _VotacaoPautaScreenState extends State<VotacaoPautaScreen> {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: color.withOpacity(0.8),
+                color: color.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,

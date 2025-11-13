@@ -1,0 +1,447 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/admin/camaras",
+    "file": "admin.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/camaras/:camaraId/vereadores",
+    "file": "admin.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/check-email",
+    "file": "admin.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/admin/partidos/check",
+    "file": "admin.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/app/vereadores/",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/auth/profile",
+    "file": "auth.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:camaraId/users/",
+    "file": "userRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:camaraId/vereadores/",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:id",
+    "file": "camaraRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:id/info",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:id/sessoes-futuras",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:id/todas-pautas",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:id/vereadores",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/:id/votacoes-recentes",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/camaras/publicas",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/livestreams/camara/:camaraId",
+    "file": "livestreamRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/livestreams/camara/:camaraId/current",
+    "file": "livestreamRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/livestreams/camara/:camaraId/display",
+    "file": "livestreamRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/livestreams/camara/:camaraId/last",
+    "file": "livestreamRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/livestreams/status",
+    "file": "livestreamRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/me",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/painel-controle/oradores",
+    "file": "painelControle.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/painel-controle/pautas-em-votacao",
+    "file": "painelControle.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/partidos/",
+    "file": "partidos.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/pautas/",
+    "file": "pautas.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/pautas/:id",
+    "file": "pautas.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/pautas/:id/estatisticas",
+    "file": "pauta.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/pautas/:id/publica",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/sessoes/",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/sessoes/:id",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/sessoes/:sessaoId/oradores",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/sessoes/disponiveis",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/sessoes/oradores",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/sessoes/vereadores-ativos",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/users/",
+    "file": "userRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/vereador/camara",
+    "file": "vereador.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/vereador/profile",
+    "file": "vereador.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/vereadores/",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/votacao-ao-vivo/status/:camaraId",
+    "file": "votacaoAoVivo.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/votos/meus-votos",
+    "file": "voto.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/votos/pauta/:id/publico",
+    "file": "public.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/votos/pauta/:pauta_id",
+    "file": "votos.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/votos/pauta/:pauta_id/estatisticas",
+    "file": "voto.js"
+  },
+  {
+    "method": "GET",
+    "path": "/api/webhooks/youtube/status",
+    "file": "webhookRoutes.js"
+  },
+  {
+    "method": "GET",
+    "path": "/health",
+    "file": "server-debug.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/admin/camaras",
+    "file": "admin.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/admin/partidos",
+    "file": "admin.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/app/vereadores/",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "file": "auth.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/logout",
+    "file": "auth.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/auth/refresh",
+    "file": "auth.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/camaras/:camaraId/vereadores/",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/livestreams/camara/:camaraId/check",
+    "file": "livestreamRoutes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notify/encerrar-votacao",
+    "file": "server.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notify/iniciar-fala",
+    "file": "server.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notify/iniciar-votacao",
+    "file": "server.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/notify/pauta-status-change",
+    "file": "server.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/painel-controle/iniciar-fala/:oradorId",
+    "file": "painelControle.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/painel-controle/iniciar-votacao/:pautaId",
+    "file": "painelControle.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/pautas/",
+    "file": "pautas.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/sessoes/",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/sessoes/oradores",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/vereadores/",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/votacao-ao-vivo/notify",
+    "file": "votacaoAoVivo.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/votacao-ao-vivo/notify-voto",
+    "file": "votacaoAoVivo.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/votos/",
+    "file": "votos.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/webhooks/youtube/subscribe",
+    "file": "webhookRoutes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/webhooks/youtube/subscribe-all",
+    "file": "webhookRoutes.js"
+  },
+  {
+    "method": "POST",
+    "path": "/api/webhooks/youtube/unsubscribe",
+    "file": "webhookRoutes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/admin/partidos/:id",
+    "file": "admin.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/app/vereadores/:id",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/camaras/:camaraId/users/:id",
+    "file": "userRoutes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/camaras/:camaraId/vereadores/:id",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/camaras/:id",
+    "file": "camaraRoutes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/pautas/:id",
+    "file": "pautas.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/pautas/:id/resultado",
+    "file": "pautas.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/pautas/:id/status",
+    "file": "pautas.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/sessoes/:id",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/sessoes/oradores/:id",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/users/:id",
+    "file": "userRoutes.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/vereador/foto",
+    "file": "vereador.js"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/vereadores/:id",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/admin/partidos/:id",
+    "file": "admin.js"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/app/vereadores/:id",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/camaras/:camaraId/vereadores/:id",
+    "file": "vereadorRoutes.js"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/pautas/:id",
+    "file": "pautas.js"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/sessoes/:id",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/sessoes/oradores/:id",
+    "file": "sessoes.js"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/vereadores/:id",
+    "file": "vereadorRoutes.js"
+  }
+]

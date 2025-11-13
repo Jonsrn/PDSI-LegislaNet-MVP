@@ -527,12 +527,16 @@
     <script src="../js/pagination.js"></script>
     <script src="../js/global.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // --- INICIALIZAÇÃO E ESTADO ---
+      document.addEventListener("DOMContentLoaded", async () => {
+        // --- INICIALIZAÇÃO E ESTADO COM AUTENTICAÇÃO MELHORADA ---
 
-        // 1. CHAMA A FUNÇÃO DE PROTEÇÃO DE PÁGINA
+        // 1. CHAMA A FUNÇÃO DE PROTEÇÃO DE PÁGINA COM VALIDAÇÃO DE ROLE
         try {
-          protectPage();
+          await protectPage({
+            allowedRoles: ["super_admin"],
+            requireAuth: true,
+            autoRedirect: true,
+          });
         } catch (e) {
           console.error(e.message);
           return; // Interrompe a execução se o usuário não estiver autenticado

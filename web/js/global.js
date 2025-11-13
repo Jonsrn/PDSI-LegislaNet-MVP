@@ -327,62 +327,358 @@ function initStatusDropdowns() {
   });
 }
 
+// ===================================================================================
+// SISTEMA DE AUTENTICAÇÃO E PROTEÇÃO DE ROTAS MELHORADO
+// ===================================================================================
+
 /**
- * Verifica se um token de autenticação existe no localStorage.
- * Se não existir, redireciona o usuário para a página de login.
- * Esta função deve ser chamada no início de todas as páginas protegidas.
+ * Configuração das rotas por role do usuário
  */
-function protectPage() {
-  console.log("[AUTH_GUARD] Iniciando verificação de autenticação...");
-  // Usamos a chave padronizada 'authToken' para verificar a existência do token.
-  const token = localStorage.getItem("authToken");
+const ROLE_ROUTES = {
+  super_admin: {
+    module: "admin",
+    defaultPage: "/admin/dashboard_admin.html",
+    allowedPaths: ["/admin/"],
+  },
+  admin_camara: {
+    module: "app",
+    defaultPage: "/app/dashboard.html",
+    allowedPaths: ["/app/"],
+  },
+  tv: {
+    module: "tv",
+    defaultPage: "/tv/espera.html",
+    allowedPaths: ["/tv/"],
+  },
+  vereador: {
+    module: "tablet",
+    defaultPage: "/tablet/", // Será usado pelo app tablet
+    allowedPaths: ["/tablet/"],
+  },
+};
 
-  if (!token) {
-    console.warn(
-      "[AUTH_GUARD] ❌ Token de autenticação não encontrado no localStorage."
-    );
-    console.log(
-      "[AUTH_GUARD] Redirecionando para a página de login: /app/login.html"
-    );
-
-    // Opcional: Limpar o localStorage para garantir um estado limpo ao ser redirecionado para o login.
-    // Isso é útil se houver dados parciais ou corrompidos.
-    localStorage.clear();
-
-    // Redireciona o usuário para a página de login
-    window.location.href = "/app/login.html";
-
-    // É importante interromper a execução do script da página atual
-    // para evitar que qualquer código que dependa da autenticação seja executado.
-    throw new Error("Não autenticado, redirecionando para login.");
-  } else {
-    console.log(
-      "[AUTH_GUARD] ✅ Token de autenticação encontrado. Acesso permitido."
-    );
-    // Opcional: Você pode decodificar o token aqui para obter informações do usuário
-    // ou buscar userData do localStorage se já tiver sido salvo no login.
-    try {
-      const userData = localStorage.getItem("userData");
-      if (userData) {
-        window.currentUser = JSON.parse(userData);
-        console.log(
-          `[AUTH_GUARD] Usuário logado: ${window.currentUser.email} (Role: ${window.currentUser.role})`
-        );
-      }
-    } catch (e) {
-      console.error(
-        "[AUTH_GUARD] Erro ao parsear userData do localStorage:",
-        e
-      );
-      // Se userData estiver corrompido, melhor limpar e redirecionar
-      localStorage.clear();
-      window.location.href = "/app/login.html";
-      throw new Error(
-        "Dados de usuário corrompidos, redirecionando para login."
-      );
-    }
+/**
+ * Decodifica o payload de um token JWT sem validação
+ * @param {string} token - O token JWT
+ * @returns {object|null} O payload decodificado ou null em caso de erro
+ */
+function decodeJwtPayload(token) {
+  try {
+    const payloadBase64 = token.split(".")[1];
+    const decodedJson = atob(payloadBase64);
+    return JSON.parse(decodedJson);
+  } catch (error) {
+    console.error("[AUTH_GUARD] Erro ao decodificar token:", error);
+    return null;
   }
 }
+
+/**
+ * Verifica se o token está próximo do vencimento (6 horas antes da expiração)
+ * @param {object} tokenPayload - Payload decodificado do token
+ * @returns {boolean} true se o token precisa ser validado
+ */
+function shouldRefreshToken(tokenPayload) {
+  if (!tokenPayload || !tokenPayload.exp) return true;
+
+  const now = Math.floor(Date.now() / 1000);
+  const timeUntilExpiry = tokenPayload.exp - now;
+  const thirtyMinutes = 30 * 60; // 30 minutos em segundos
+
+  // Token dura 3h (10800s), renova quando faltam 30 minutos ou menos
+  return timeUntilExpiry <= thirtyMinutes;
+}
+
+/**
+ * Tenta renovar o token usando o refresh token do Supabase
+ * @returns {Promise<boolean>} true se a renovação foi bem-sucedida
+ */
+async function refreshAuthToken() {
+  console.log("[AUTH_GUARD] 🔄 Tentando validar/renovar token...");
+
+  try {
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) return false;
+
+    const response = await fetch("/api/auth/refresh", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Atualiza os dados no localStorage
+      localStorage.setItem("authToken", data.token);
+      if (data.user) {
+        localStorage.setItem("userData", JSON.stringify(data.user));
+        window.currentUser = data.user;
+      }
+
+      console.log("[AUTH_GUARD] ✅ Token validado e dados atualizados");
+      return true;
+    } else {
+      console.warn("[AUTH_GUARD] ⚠️ Falha na validação do token");
+      return false;
+    }
+  } catch (error) {
+    console.error("[AUTH_GUARD] ❌ Erro ao validar token:", error);
+    return false;
+  }
+}
+
+/**
+ * Verifica se o usuário tem permissão para acessar a rota atual
+ * @param {string} userRole - Role do usuário
+ * @param {string} currentPath - Caminho atual da página
+ * @returns {boolean} true se o usuário tem permissão
+ */
+function hasRoutePermission(userRole, currentPath) {
+  const roleConfig = ROLE_ROUTES[userRole];
+  if (!roleConfig) return false;
+
+  return roleConfig.allowedPaths.some((allowedPath) =>
+    currentPath.startsWith(allowedPath)
+  );
+}
+
+/**
+ * Redireciona o usuário para a página correta baseada no seu role
+ * @param {string} userRole - Role do usuário
+ * @param {string} currentPath - Caminho atual (opcional)
+ */
+function redirectToCorrectModule(
+  userRole,
+  currentPath = window.location.pathname
+) {
+  const roleConfig = ROLE_ROUTES[userRole];
+
+  if (!roleConfig) {
+    console.error(`[AUTH_GUARD] ❌ Role desconhecido: ${userRole}`);
+    clearAuthAndRedirectToLogin();
+    return;
+  }
+
+  // Se já está na rota correta, não redireciona
+  if (hasRoutePermission(userRole, currentPath)) {
+    console.log(
+      `[AUTH_GUARD] ✅ Usuário já está no módulo correto: ${roleConfig.module}`
+    );
+    return;
+  }
+
+  // Redireciona para o módulo correto
+  console.log(
+    `[AUTH_GUARD] 🔀 Redirecionando ${userRole} para: ${roleConfig.defaultPage}`
+  );
+  window.location.href = roleConfig.defaultPage;
+}
+
+/**
+ * Limpa dados de autenticação e redireciona para login
+ */
+function clearAuthAndRedirectToLogin() {
+  console.log(
+    "[AUTH_GUARD] 🔄 Limpando autenticação e redirecionando para login..."
+  );
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("userData");
+  window.currentUser = null;
+  window.location.href = "/app/login.html";
+}
+
+/**
+ * Função principal de proteção de página com validação completa
+ * @param {object} options - Opções de configuração
+ * @param {string[]} options.allowedRoles - Roles permitidas para a página (opcional)
+ * @param {boolean} options.requireAuth - Se requer autenticação (padrão: true)
+ * @param {boolean} options.autoRedirect - Se deve redirecionar automaticamente baseado no role (padrão: true)
+ */
+async function protectPage(options = {}) {
+  const {
+    allowedRoles = null,
+    requireAuth = true,
+    autoRedirect = true,
+  } = options;
+
+  console.log("[AUTH_GUARD] 🛡️ Iniciando verificação de autenticação...");
+
+  if (!requireAuth) {
+    console.log("[AUTH_GUARD] ℹ️ Página não requer autenticação");
+    return true;
+  }
+
+  const token = localStorage.getItem("authToken");
+  const userData = localStorage.getItem("userData");
+
+  // Verifica se há token
+  if (!token) {
+    console.warn("[AUTH_GUARD] ❌ Token não encontrado");
+    clearAuthAndRedirectToLogin();
+    throw new Error("Não autenticado");
+  }
+
+  // Decodifica e valida o token
+  const tokenPayload = decodeJwtPayload(token);
+  if (!tokenPayload) {
+    console.warn("[AUTH_GUARD] ❌ Token inválido");
+    clearAuthAndRedirectToLogin();
+    throw new Error("Token inválido");
+  }
+
+  // Verifica se o token expirou
+  const now = Math.floor(Date.now() / 1000);
+  if (tokenPayload.exp && tokenPayload.exp <= now) {
+    console.warn("[AUTH_GUARD] ⏰ Token expirado");
+
+    // Tenta renovar o token
+    const refreshSuccess = await refreshAuthToken();
+    if (!refreshSuccess) {
+      clearAuthAndRedirectToLogin();
+      throw new Error("Token expirado e não foi possível renovar");
+    }
+  }
+  // Verifica se precisa renovar em breve
+  else if (shouldRefreshToken(tokenPayload)) {
+    console.log("[AUTH_GUARD] 🔄 Token próximo do vencimento, renovando...");
+    try {
+      await refreshAuthToken();
+      console.log("[AUTH_GUARD] ✅ Token renovado preventivamente");
+    } catch (error) {
+      console.warn("[AUTH_GUARD] ⚠️ Renovação automática falhou:", error);
+      // Token ainda válido, não bloqueia acesso
+    }
+  }
+
+  // Valida e carrega dados do usuário
+  let currentUser;
+  try {
+    if (userData) {
+      currentUser = JSON.parse(userData);
+      window.currentUser = currentUser;
+    } else {
+      console.warn("[AUTH_GUARD] ⚠️ Dados do usuário não encontrados");
+      clearAuthAndRedirectToLogin();
+      throw new Error("Dados do usuário não encontrados");
+    }
+  } catch (error) {
+    console.error("[AUTH_GUARD] ❌ Erro ao parsear dados do usuário:", error);
+    clearAuthAndRedirectToLogin();
+    throw new Error("Dados do usuário corrompidos");
+  }
+
+  console.log(
+    `[AUTH_GUARD] ✅ Usuário autenticado: ${currentUser.email} (${currentUser.role})`
+  );
+
+  // Verifica permissões específicas da página
+  if (allowedRoles && !allowedRoles.includes(currentUser.role)) {
+    console.error(
+      `[AUTH_GUARD] ❌ Acesso negado. Role ${
+        currentUser.role
+      } não permitido. Permitidos: ${allowedRoles.join(", ")}`
+    );
+
+    if (autoRedirect) {
+      redirectToCorrectModule(currentUser.role);
+    } else {
+      throw new Error("Acesso negado");
+    }
+    return false;
+  }
+
+  // Auto-redirecionamento baseado no role (se habilitado)
+  if (autoRedirect) {
+    const currentPath = window.location.pathname;
+    if (!hasRoutePermission(currentUser.role, currentPath)) {
+      redirectToCorrectModule(currentUser.role, currentPath);
+      return false;
+    }
+  }
+
+  console.log("[AUTH_GUARD] ✅ Autenticação e autorização bem-sucedidas");
+  return true;
+}
+
+// ===================================================================================
+// INICIALIZAÇÃO AUTOMÁTICA E VERIFICAÇÃO DE SESSÃO
+// ===================================================================================
+
+/**
+ * Função de inicialização automática da autenticação
+ * Verifica periodicamente a validade do token e renova automaticamente
+ */
+function initializeAuthGuard() {
+  console.log("[AUTH_GUARD] 🚀 Inicializando sistema de autenticação...");
+
+  // Verifica token a cada 5 minutos
+  const TOKEN_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutos
+
+  setInterval(async () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) return;
+
+    const tokenPayload = decodeJwtPayload(token);
+    if (!tokenPayload) return;
+
+    // Se o token está próximo do vencimento, renova automaticamente
+    if (shouldRefreshToken(tokenPayload)) {
+      console.log("[AUTH_GUARD] 🔄 Renovação automática de token iniciada...");
+      const success = await refreshAuthToken();
+      if (!success) {
+        console.warn(
+          "[AUTH_GUARD] ⚠️ Falha na renovação automática, usuário será deslogado"
+        );
+        clearAuthAndRedirectToLogin();
+      }
+    }
+  }, TOKEN_CHECK_INTERVAL);
+
+  // Escuta eventos de mudança no localStorage (múltiplas abas)
+  window.addEventListener("storage", (e) => {
+    if (e.key === "authToken" && !e.newValue) {
+      console.log(
+        "[AUTH_GUARD] 🔄 Token removido em outra aba, redirecionando..."
+      );
+      clearAuthAndRedirectToLogin();
+    }
+  });
+
+  console.log("[AUTH_GUARD] ✅ Sistema de autenticação inicializado");
+}
+
+/**
+ * Função helper para páginas que precisam de proteção automática
+ * @param {object} pageConfig - Configuração da página e autenticação
+ */
+async function initPageWithAuth(pageConfig) {
+  const { auth, ...layoutConfig } = pageConfig;
+
+  // Aplica proteção se configurada
+  if (auth) {
+    try {
+      await protectPage(auth);
+    } catch (error) {
+      console.error("[AUTH_GUARD] Falha na autenticação da página:", error);
+      return false;
+    }
+  }
+
+  // Inicializa o layout após autenticação bem-sucedida
+  if (layoutConfig && Object.keys(layoutConfig).length > 0) {
+    await initLayout(layoutConfig);
+  }
+
+  return true;
+}
+
+// Inicializa o sistema de autenticação quando o DOM estiver pronto
+document.addEventListener("DOMContentLoaded", () => {
+  initializeAuthGuard();
+});
 
 /**
  * Realiza o logout do usuário, invalidando o token no backend e limpando o frontend.
