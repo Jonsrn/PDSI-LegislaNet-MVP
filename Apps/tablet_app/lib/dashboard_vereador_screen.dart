@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'votacao_pauta_screen.dart'; // Importação Relativa da nova tela
 import 'services/auth_service.dart';
 import 'services/websocket_service.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,14 +18,14 @@ class DashboardVereadorScreen extends StatefulWidget {
 
 class _DashboardVereadorScreenState extends State<DashboardVereadorScreen> {
   TabState _currentTab = TabState.pendente;
-  bool _isUserConnected = true; // Flag de conexão do usuário
+  final bool _isUserConnected = true; // Flag de conexão do usuário
   Map<String, dynamic>? _vereadorData;
   bool _isLoadingVereador = true;
   List<Map<String, dynamic>> _pautasPendentes = [];
   List<Map<String, dynamic>> _pautasEmVotacao = [];
   List<Map<String, dynamic>> _pautasFinalizadas = [];
   bool _isLoadingPautas = true;
-  Map<String, Map<String, dynamic>> _votosVereador = {}; // Cache dos votos do vereador
+  final Map<String, Map<String, dynamic>> _votosVereador = {}; // Cache dos votos do vereador
 
   // WebSocket para notificações em tempo real
   final WebSocketService _webSocketService = WebSocketService.instance;
@@ -377,6 +375,7 @@ class _DashboardVereadorScreenState extends State<DashboardVereadorScreen> {
         throw 'Não foi possível abrir o PDF';
       }
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erro ao abrir PDF: $e'),
@@ -1015,9 +1014,9 @@ class _VotacaoCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1098,9 +1097,9 @@ class _VotacaoCard extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.2),
+          color: statusColor.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: statusColor.withOpacity(0.6)),
+          border: Border.all(color: statusColor.withValues(alpha: 0.6)),
         ),
         child: Text(
           status.toUpperCase(),

@@ -18,7 +18,9 @@
       "Bash(dir:*)",
       "Bash(git checkout:*)",
       "Bash(npx jest:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(python:*)",
+      "Bash(flutter analyze:*)"
     ],
     "deny": [],
     "ask": []

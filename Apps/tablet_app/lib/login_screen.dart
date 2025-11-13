@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // Importe o pacote flutter_svg
-import 'dashboard_vereador_screen.dart';
 import 'services/auth_service.dart';
 
 // Definição da paleta de cores baseada no global.css
@@ -46,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final result = await AuthService.login(email, password);
 
       if (result['success']) {
+        if (!mounted) return;
         Navigator.of(context).pushReplacementNamed('/dashboard');
       } else {
         _showError(result['error'] ?? 'Erro desconhecido');
@@ -184,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildCustomLogo() {
-    return Container(
+    return SizedBox(
       width: 44,
       height: 40,
       child: CustomPaint(
