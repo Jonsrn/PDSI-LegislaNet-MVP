@@ -2,25 +2,26 @@ const express = require("express");
 const router = express.Router();
 const votacaoAoVivoController = require("../controllers/votacaoAoVivoController");
 const {
-  canManagePautas,
   canAccessVotacaoStatus,
 } = require("../middleware/authMiddleware");
 
+// ============================================================================
+// ROTAS INTERNAS (Comunicação Cross-Server)
+// Usadas pelo Tablet Backend (:3003) para notificar o Web Backend (:3000)
+// SEM AUTENTICAÇÃO - Comunicação direta entre servidores confiáveis
+// ============================================================================
+
 // Rota para receber notificações de votação ao vivo (chamada pelo tablet backend)
-router.post(
-  "/notify",
-  canManagePautas,
-  votacaoAoVivoController.notifyVotacaoAoVivo
-);
+router.post("/notify", votacaoAoVivoController.notifyVotacaoAoVivo);
 
 // Rota para receber notificações de votos (chamada pelo tablet backend)
-router.post(
-  "/notify-voto",
-  canManagePautas,
-  votacaoAoVivoController.notifyVoto
-);
+router.post("/notify-voto", votacaoAoVivoController.notifyVoto);
 
-// Rota para portal público consultar status atual - agora protegida para tv+
+// ============================================================================
+// ROTAS PÚBLICAS (Protegidas por JWT)
+// ============================================================================
+
+// Rota para portal público e TVs consultarem status atual
 router.get(
   "/status/:camaraId",
   canAccessVotacaoStatus,

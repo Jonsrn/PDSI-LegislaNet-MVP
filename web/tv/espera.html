@@ -112,6 +112,8 @@
 
     <!-- Load Socket.IO client from CDN; if unavailable, dynamically load it before connecting -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="../js/global.js"></script>
+
     <script>
       // Basic logger usage
       const camaraNameEl = document.getElementById("nomeCamara");
@@ -128,14 +130,14 @@
       // Try to load camara info via API using token
       async function init() {
         // === NOVA AUTENTICAÇÃO COM VALIDAÇÃO DE ROLE ===
-        try {
-          await protectPage({
-            allowedRoles: ["tv"],
-            requireAuth: true,
-            autoRedirect: true,
-          });
-        } catch (error) {
-          console.error("[TV] Falha na autenticação:", error);
+        const isAuthenticated = await protectPage({
+          allowedRoles: ["tv"],
+          requireAuth: true,
+          autoRedirect: true,
+        });
+
+        if (!isAuthenticated) {
+          console.error("[TV] Falha na autenticação");
           return;
         }
 

@@ -203,7 +203,7 @@ app.post("/api/notify/iniciar-votacao", (req, res) => {
       pautaNome
     );
 
-    // Notificar servidor global (porta 3000) para atualizar portal público
+    // Notificar servidor global (porta 3000) para atualizar portal público e TVs
     const http = require("http");
     const notificationPayload = JSON.stringify({
       camaraId,
