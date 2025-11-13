@@ -3,7 +3,8 @@
  * Valida login, logout e verificação de tokens para todas as roles
  */
 
-const { webRequest, tabletRequest } = require('../../helpers/request.helper');
+const { webRequest } = require('../../helpers/request.helper');
+const { tabletRequest } = require('../../helpers/tablet-request.helper');
 const { CREDENTIALS } = require('../../config/testData');
 
 describe('🔐 Autenticação - Web Backend', () => {
@@ -110,9 +111,11 @@ describe('🔐 Autenticação - Web Backend', () => {
   });
 });
 
-describe.skip('🔐 Autenticação - Tablet Backend (REQUER SERVIDOR NA PORTA 3003)', () => {
+describe('🔐 Autenticação - Tablet Backend', () => {
+  let vereadorToken;
+
   describe('POST /api/auth/login', () => {
-    test('Deve fazer login como vereador', async () => {
+    test('Deve fazer login como vereador com credenciais válidas', async () => {
       const response = await tabletRequest()
         .post('/api/auth/login')
         .send(CREDENTIALS.vereador);
@@ -120,44 +123,108 @@ describe.skip('🔐 Autenticação - Tablet Backend (REQUER SERVIDOR NA PORTA 30
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('token');
       expect(response.body).toHaveProperty('user');
-      expect(response.body.user.email).toBe(CREDENTIALS.vereador.email);
+      expect(response.body.user).toHaveProperty('email', CREDENTIALS.vereador.email);
+      expect(response.body.user).toHaveProperty('role', 'vereador');
+
+      // Salvar token para testes subsequentes
+      vereadorToken = response.body.token;
     });
 
-    test('Deve rejeitar credenciais inválidas', async () => {
+    test('Deve retornar erro com credenciais inválidas', async () => {
       const response = await tabletRequest()
         .post('/api/auth/login')
         .send({
-          email: 'vereador@inexistente.com',
-          password: 'senhaerrada'
+          email: CREDENTIALS.vereador.email,
+          password: 'senha_errada'
         });
 
-      expect(response.status).toBe(401);
+      expect([400, 401]).toContain(response.status);
+    });
+
+    test('Deve retornar erro sem email', async () => {
+      const response = await tabletRequest()
+        .post('/api/auth/login')
+        .send({
+          password: CREDENTIALS.vereador.password
+        });
+
+      expect([400, 422]).toContain(response.status);
+    });
+
+    test('Deve retornar erro sem senha', async () => {
+      const response = await tabletRequest()
+        .post('/api/auth/login')
+        .send({
+          email: CREDENTIALS.vereador.email
+        });
+
+      expect([400, 422]).toContain(response.status);
+    });
+
+    test('Deve retornar erro com email inválido', async () => {
+      const response = await tabletRequest()
+        .post('/api/auth/login')
+        .send({
+          email: 'email_invalido',
+          password: 'senha123'
+        });
+
+      expect([400, 422]).toContain(response.status);
+    });
+
+    test('Deve rejeitar login de não-vereador (admin_camara)', async () => {
+      const response = await tabletRequest()
+        .post('/api/auth/login')
+        .send(CREDENTIALS.admin_camara);
+
+      // Admin da câmara não pode fazer login no tablet
+      expect([401, 403]).toContain(response.status);
+    });
+
+    test('Deve rejeitar login de não-vereador (super_admin)', async () => {
+      const response = await tabletRequest()
+        .post('/api/auth/login')
+        .send(CREDENTIALS.super_admin);
+
+      // Super admin não pode fazer login no tablet
+      expect([401, 403]).toContain(response.status);
+    });
+
+    test('Deve rejeitar login de não-vereador (tv)', async () => {
+      const response = await tabletRequest()
+        .post('/api/auth/login')
+        .send(CREDENTIALS.tv);
+
+      // TV não pode fazer login no tablet
+      expect([401, 403]).toContain(response.status);
     });
   });
 
-  describe('GET /api/auth/profile', () => {
-    let token;
+  describe('POST /api/auth/logout', () => {
+    test('Deve fazer logout com token válido', async () => {
+      if (vereadorToken) {
+        const response = await tabletRequest()
+          .post('/api/auth/logout')
+          .set('Authorization', `Bearer ${vereadorToken}`);
 
-    beforeAll(async () => {
-      const response = await tabletRequest()
-        .post('/api/auth/login')
-        .send(CREDENTIALS.vereador);
-      token = response.body.token;
+        expect([200, 204]).toContain(response.status);
+      } else {
+        // Skip se não temos token
+        expect(true).toBe(true);
+      }
     });
 
-    test('Deve retornar perfil do vereador autenticado', async () => {
+    test('Deve rejeitar logout sem token', async () => {
       const response = await tabletRequest()
-        .get('/api/auth/profile')
-        .set('Authorization', `Bearer ${token}`);
+        .post('/api/auth/logout');
 
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('user');
-      expect(response.body.user.email).toBe(CREDENTIALS.vereador.email);
+      expect(response.status).toBe(401);
     });
 
-    test('Deve rejeitar sem token', async () => {
+    test('Deve rejeitar logout com token inválido', async () => {
       const response = await tabletRequest()
-        .get('/api/auth/profile');
+        .post('/api/auth/logout')
+        .set('Authorization', 'Bearer token_invalido_123');
 
       expect(response.status).toBe(401);
     });

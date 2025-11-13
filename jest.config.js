@@ -14,6 +14,9 @@ module.exports = {
   // Timeout padrão para testes (10 segundos)
   testTimeout: 10000,
 
+  // Executar testes sequencialmente para evitar problemas de rate limit
+  maxWorkers: 1,
+
   // Cobertura de código
   collectCoverageFrom: [
     'src/**/*.js',
