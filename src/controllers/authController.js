@@ -280,9 +280,73 @@ const getMe = async (req, res) => {
   }
 };
 
+const handleRefreshToken = async (req, res) => {
+  logger.log("🔄 === INÍCIO DO PROCESSO DE REFRESH TOKEN ===");
+
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      logger.error("❌ Token de autorização ausente ou mal formatado");
+      return res.status(401).json({ error: "Token de autorização requerido" });
+    }
+
+    const currentToken = authHeader.split(" ")[1];
+    logger.log("🔍 Verificando token atual...");
+
+    // Verifica se o token atual ainda é válido
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser(currentToken);
+
+    if (userError || !user) {
+      logger.error("❌ Token atual inválido:", userError?.message);
+      return res.status(401).json({ error: "Token inválido" });
+    }
+
+    logger.log(`✅ Token atual válido para usuário: ${user.id}`);
+
+    // Busca dados atualizados do perfil
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .select("role, nome, camara_id")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profileData) {
+      logger.error("❌ Perfil não encontrado para o usuário ID:", user.id);
+      return res
+        .status(404)
+        .json({ error: "Perfil de usuário não encontrado." });
+    }
+
+    // Como não podemos gerar um novo token manualmente,
+    // vamos retornar o token atual com dados atualizados
+    // O frontend continuará usando o mesmo token
+
+    logger.log("✅ Token validado e dados do usuário atualizados!");
+
+    return res.status(200).json({
+      message: "Token validado com sucesso!",
+      user: {
+        id: user.id,
+        email: user.email,
+        nome: profileData.nome,
+        role: profileData.role,
+        camara_id: profileData.camara_id,
+      },
+      token: currentToken, // Retorna o mesmo token
+    });
+  } catch (error) {
+    logger.error("💥 ERRO INESPERADO NO REFRESH TOKEN:", error);
+    return res.status(500).json({ error: "Erro interno no servidor" });
+  }
+};
+
 module.exports = {
   handleLogin,
   handleLogout,
+  handleRefreshToken,
   getVereadorProfile,
   getMe,
 };

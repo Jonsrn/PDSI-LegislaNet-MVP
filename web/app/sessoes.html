@@ -375,10 +375,15 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
+                // === NOVA AUTENTICAÇÃO COM VALIDAÇÃO DE ROLE ===
         try {
-          protectPage();
-        } catch (e) {
-          console.error(e.message);
+          await protectPage({
+            allowedRoles: ['admin_camara'],
+            requireAuth: true,
+            autoRedirect: true
+          });
+        } catch (error) {
+          console.error('[AUTH] Falha na autenticação:', error);
           return;
         }
 

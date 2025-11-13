@@ -125,10 +125,21 @@
       // Expor socket globalmente para permitir reconexão a partir do botão
       let tvSocket = null;
 
-      const token = localStorage.getItem("authToken");
-      const urlParams = new URLSearchParams(window.location.search);
       // Try to load camara info via API using token
       async function init() {
+        // === NOVA AUTENTICAÇÃO COM VALIDAÇÃO DE ROLE ===
+        try {
+          await protectPage({
+            allowedRoles: ["tv"],
+            requireAuth: true,
+            autoRedirect: true,
+          });
+        } catch (error) {
+          console.error("[TV] Falha na autenticação:", error);
+          return;
+        }
+
+        const token = localStorage.getItem("authToken");
         try {
           if (!token) {
             console.log("❌ Token não encontrado");

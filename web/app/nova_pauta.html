@@ -102,7 +102,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                protectPage();
+                        // === NOVA AUTENTICAÇÃO COM VALIDAÇÃO DE ROLE ===
+        try {
+          await protectPage({
+            allowedRoles: ['admin_camara'],
+            requireAuth: true,
+            autoRedirect: true
+          });
+        } catch (error) {
+          console.error('[AUTH] Falha na autenticação:', error);
+          return;
+        }
                 initLayout({
                     title: 'Nova Pauta',
                     icon: 'fa-file-pen',

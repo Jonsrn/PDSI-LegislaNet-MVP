@@ -240,7 +240,9 @@
             return;
           }
 
+          // Salva o token e dados do usuário
           localStorage.setItem("authToken", result.token);
+          localStorage.setItem("userData", JSON.stringify(result.user));
 
           let redirectUrl = null;
           if (result.user && result.user.role === "super_admin") {
@@ -250,6 +252,13 @@
           } else if (result.user && result.user.role === "tv") {
             // TVs don't need an extra login page; redirect to TV waiting template
             redirectUrl = `/tv/espera.html`;
+          } else if (result.user && result.user.role === "vereador") {
+            // Vereadores serão redirecionados para o app tablet
+            showToast(
+              "Login bem-sucedido! Use o aplicativo tablet para continuar.",
+              "success"
+            );
+            return;
           }
 
           if (redirectUrl) {
